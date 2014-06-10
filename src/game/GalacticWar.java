@@ -28,6 +28,7 @@ public class GalacticWar extends JFrame implements Runnable, KeyListener {
 	// Sprite states
 	static int SPRITE_NORMAL = 0;
 	static int SPRITE_COLLIDED = 1;
+	static int SPRITE_EXPLODING = 2;
 	
 	// Game objects
 	static int ASTEROIDS = 10;	
@@ -41,6 +42,7 @@ public class GalacticWar extends JFrame implements Runnable, KeyListener {
 	Sprite[] bullet = new Sprite[BULLETS];
 	int currentBullet = 0;
 	ImageEntity background;
+	AnimatedSprite explosion;
 	
 	// Support
 	AffineTransform identity = new AffineTransform();
@@ -57,7 +59,9 @@ public class GalacticWar extends JFrame implements Runnable, KeyListener {
 	
 	// Dev support
 	boolean showBounds = false;
-	boolean collisionTesting = false;
+	boolean collisionTesting = true;
+	long collisionTimer = 0;
+	
 	
 	// Keyboard
 	boolean keyDown, keyUp, keyLeft, keyRight, keyFire;
@@ -65,6 +69,7 @@ public class GalacticWar extends JFrame implements Runnable, KeyListener {
 	// Frame controls
 	int frameCount = 0, frameRate = 0;
 	long startTime = System.currentTimeMillis();
+	
 	
 	public GalacticWar() { 		
 		super("Galatic War");
@@ -75,6 +80,12 @@ public class GalacticWar extends JFrame implements Runnable, KeyListener {
 		// Set Background
 		background = new ImageEntity(this);
 		background.load("images/space.png");
+		
+		// Load explosion
+		explosion = new AnimatedSprite(this, g2d);
+		explosion.load("images/explosion.png", 1, 16, 60, 60);
+		explosion.setFrameDelay(2);
+		explosion.setAlive(false);
 		
 		// Initialize in-game objects
 		ship = new Sprite(this, g2d);
@@ -92,7 +103,7 @@ public class GalacticWar extends JFrame implements Runnable, KeyListener {
 			ast[j].setAlive(true);
 			
 			int i=rand.nextInt(5);
-			ast[j].load("images/asteroid" + i + ".png");
+			ast[j].load("images/asteroid.png");
 			
 			int x = rand.nextInt(SCREENWIDTH);
 			int y = rand.nextInt(SCREENHEIGHT);
@@ -152,7 +163,12 @@ public class GalacticWar extends JFrame implements Runnable, KeyListener {
 		updateShip();
 		updateBullets();
 		updateAsteroids();
-		if (collisionTesting) checkCollisions();
+		if (collisionTesting) {
+			checkCollisions();
+			handleShipCollisions();
+			handleBulletCollisions();
+			handleAsteroidCollisions();
+		}
 	}
 	
 	public void updateShip() {
@@ -233,7 +249,7 @@ public class GalacticWar extends JFrame implements Runnable, KeyListener {
 						if (ast[m].collidesWith(bullet[n])){
 							bullet[n].setState(SPRITE_COLLIDED);
 							ast[m].setState(SPRITE_COLLIDED);
-							explode.play();
+							// explode.play();
 						}
 					}
 				}
@@ -242,10 +258,48 @@ public class GalacticWar extends JFrame implements Runnable, KeyListener {
 			if(ship.collidesWith(ast[m])) {
 				ast[m].setState(SPRITE_COLLIDED);
 				ship.setState(SPRITE_COLLIDED);
-				explode.play();
+				// explode.play();
 			}
 		}
 	}	
+	
+	public void handleShipCollisions() {
+		if (ship.state() == SPRITE_COLLIDED) {
+			collisionTimer = System.currentTimeMillis();
+			ship.setVelocity(new Point2D(0,0));
+			ship.setState(SPRITE_EXPLODING);
+			startExplosion(ship);
+		} else if (ship.state() == SPRITE_EXPLODING) {
+			if(collisionTimer + 3000 < System.currentTimeMillis()) {
+				ship.setState(SPRITE_NORMAL);
+			}
+		}
+	}
+	
+	public void startExplosion(Sprite sprite) {
+		if(!explosion.alive()) {
+			double x = sprite.position().X() - sprite.getBounds().width/2;
+			double y = sprite.position().Y() - sprite.getBounds().height/2;
+			explosion.setPosition(new Point2D(x,y));
+			explosion.setAlive(true);
+		}
+	}
+	
+	public void handleBulletCollisions() {
+		for(int n=0;n<BULLETS;n++) {
+			if(bullet[n].state() == SPRITE_COLLIDED) {
+				
+			}
+		}
+	}
+	
+	public void handleAsteroidCollisions() {
+		for(int n=0;n<ASTEROIDS;n++) {
+			if(ast[n].state() == SPRITE_COLLIDED) {
+				
+			}
+		}
+	}
 	
 	/**
 	 *  PAINT METHODS
@@ -267,6 +321,7 @@ public class GalacticWar extends JFrame implements Runnable, KeyListener {
 		drawShip();
 		drawBullets();
 		drawAsteroids();
+		drawExplosions();
 		g.drawImage(backBuffer, 0, 0, this);
 	}	
 	
@@ -311,6 +366,18 @@ public class GalacticWar extends JFrame implements Runnable, KeyListener {
 						ast[n].drawBounds(Color.BLUE);
 					}
 				}
+			}
+		}
+	}
+	
+	public void drawExplosions() {
+		if (explosion.alive()) {
+			explosion.update();
+			if (explosion.currentFrame() == explosion.totalFrames() - 1) {
+				explosion.setCurrentFrame(0);
+				explosion.setAlive(false);
+			} else {
+				explosion.draw();
 			}
 		}
 	}

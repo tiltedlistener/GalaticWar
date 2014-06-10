@@ -11,8 +11,8 @@ public class AnimatedSprite {
 	protected Graphics2D g2d;
 	protected Image image;
 	public boolean alive;
-	public Point position;
-	public Point velocity;
+	public Point2D position;
+	public Point2D velocity;
 	public double rotationRate;
 	public int currentState;
 	public int currentFrame, totalFrames;
@@ -26,8 +26,8 @@ public class AnimatedSprite {
 		g2d = _g2d;
 		image = null;
 		alive = true;
-		position = new Point(0,0);
-		velocity = new Point(0,0);
+		position = new Point2D(0,0);
+		velocity = new Point2D(0,0);
 		rotationRate = 0.0;
 		currentState = 0;
 		currentFrame = 0;
@@ -95,7 +95,8 @@ public class AnimatedSprite {
 		update();
 		int fx = (currentFrame % columns) * frameWidth;
 		int fy = (currentFrame / columns) * frameHeight;
-		g2d.drawImage(image, position.x, position.y, position.x + frameWidth, position.y + frameHeight, fx, fy, fx+frameWidth, fy+frameHeight, getJFrame());
+		
+		g2d.drawImage(image, (int)position.x, (int)position.y, (int)position.x + frameWidth, (int)position.y + frameHeight, fx, fy, fx+frameWidth, fy+frameHeight, getJFrame());
 	}	
 	
 	public void update() {
@@ -140,6 +141,36 @@ public class AnimatedSprite {
 
 	public boolean collidesWith(Point point) {
 		return (getBounds().contains(point.x, point.y));
+	}
+	
+	public void setAlive(boolean alive) {
+		this.alive = alive;
+	}
+	
+	public boolean alive() {
+		return this.alive;
+	}
+	
+	public void setFrameDelay(int delay) {
+		frameDelay = delay;
+	}
+	
+	public void setCurrentFrame(int frame) {
+		this.currentFrame = frame;
+	}
+	
+	public int totalFrames() {
+		return frameCount;
+	}
+	
+	public int currentFrame() {
+		return this.currentFrame;
+	}
+	
+	public void setPosition(Point2D point) {
+		this.position = point;
+		System.out.println("NEW X " + point.x);
+		System.out.println("REAL POSITION X " + this.position.x);
 	}
 	
 }

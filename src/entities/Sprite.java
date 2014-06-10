@@ -22,7 +22,6 @@ public class Sprite extends Object {
 	}
 	
 	public void load(String filename) {
-		System.out.println(filename);
 		entity.load(filename);
 	}
 	
