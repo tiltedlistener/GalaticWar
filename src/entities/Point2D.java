@@ -21,4 +21,12 @@ public class Point2D extends Point {
 		return y;
 	}
 	
+	public void setX(double x) {
+		this.x = x;
+	}
+	
+	public void setY(double y) {
+		this.y = y;
+	}
+	
 }
