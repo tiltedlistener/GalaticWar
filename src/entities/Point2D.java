@@ -6,6 +6,7 @@ public class Point2D extends Point {
 
 	public double x;
 	public double y;
+	public int id;
 	
 	public Point2D(double x, double y) {
 		this.x = x;

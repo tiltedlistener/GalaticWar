@@ -96,12 +96,12 @@ public class AnimatedSprite {
 		int fx = (currentFrame % columns) * frameWidth;
 		int fy = (currentFrame / columns) * frameHeight;
 		
-		g2d.drawImage(image, (int)position.x, (int)position.y, (int)position.x + frameWidth, (int)position.y + frameHeight, fx, fy, fx+frameWidth, fy+frameHeight, getJFrame());
+		g2d.drawImage(image, (int)position.X(), (int)position.Y(), (int)position.X() + frameWidth, (int)position.Y() + frameHeight, fx, fy, fx+frameWidth, fy+frameHeight, getJFrame());
 	}	
 	
 	public void update() {
-		position.x = velocity.x;
-		position.y = velocity.y;
+		position.x += velocity.x;
+		position.y += velocity.y;
 		
 		if (rotationRate > 0.0) {
 			faceAngle += rotationRate;
@@ -168,9 +168,7 @@ public class AnimatedSprite {
 	}
 	
 	public void setPosition(Point2D point) {
-		this.position = point;
-		System.out.println("NEW X " + point.x);
-		System.out.println("REAL POSITION X " + this.position.x);
+		position = point;
 	}
 	
 }

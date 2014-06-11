@@ -278,9 +278,10 @@ public class GalacticWar extends JFrame implements Runnable, KeyListener {
 	
 	public void startExplosion(Sprite sprite) {
 		if(!explosion.alive()) {
-			double x = sprite.position().X() - sprite.getBounds().width/2;
-			double y = sprite.position().Y() - sprite.getBounds().height/2;
-			explosion.setPosition(new Point2D(x,y));
+			double x = sprite.position().X() + sprite.getBounds().width/2;
+			double y = sprite.position().Y() + sprite.getBounds().height/2;			
+			Point2D tempPoint = new Point2D(x,y);
+			explosion.setPosition(tempPoint);
 			explosion.setAlive(true);
 		}
 	}
