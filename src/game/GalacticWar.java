@@ -13,13 +13,14 @@ import java.awt.image.*;
 import java.util.*;
 import java.lang.System;
 
-public class GalacticWar extends JFrame implements Runnable, KeyListener {
+public class GalacticWar extends Game {
 
 	public static void main(String[] args) {
 		new GalacticWar();
 	}
 	
 	// Main Graphics variables
+	static int FRAMERATE = 60;
 	static int SCREENWIDTH = 800;
 	static int SCREENHEIGHT = 600;
 	static int CENTERX = SCREENWIDTH / 2;
@@ -35,99 +36,65 @@ public class GalacticWar extends JFrame implements Runnable, KeyListener {
 	static int BULLETS = 10;
 	static int BULLET_SPEED = 4;
 	static double ACCELERATION = 0.05;
+	static double SHIPROTATION = 5.0;
 	
-	// Screen entities
-	Sprite ship;
-	Sprite[] ast = new Sprite[ASTEROIDS];
-	Sprite[] bullet = new Sprite[BULLETS];
-	int currentBullet = 0;
+	// Sprite types
+	final int SPRITE_SHIP = 1;
+	final int SPIRTE_ASTEROID_BIG = 10;
+	final int SPIRTE_ASTEROID_MEDIUM = 11;
+	final int SPIRTE_ASTEROID_SMALL = 12;
+	final int SPIRTE_ASTEROID_TINY = 13;
+	
+	// Images
 	ImageEntity background;
-	AnimatedSprite explosion;
-	
+	ImageEntity bulletImage;
+	ImageEntity[] bigAsteriods = new ImageEntity[5];
+	ImageEntity[] medAsteriods = new ImageEntity[2];
+	ImageEntity[] smlAsteriods = new ImageEntity[3];
+	ImageEntity[] tnyAsteriods = new ImageEntity[4];
+	ImageEntity[] explosions = new ImageEntity[2];
+	ImageEntity[] shipImage = new ImageEntity[2];
+		
 	// Support
 	AffineTransform identity = new AffineTransform();
 	Random rand = new Random();
-	
-	// Sound 
-	SoundClip shoot;
-	SoundClip explode;
-	
-	// Graphics
-	Thread gameloop;
-	BufferedImage backBuffer;
-	Graphics2D g2d;
 	
 	// Dev support
 	boolean showBounds = false;
 	boolean collisionTesting = true;
 	long collisionTimer = 0;
 	
-	
 	// Keyboard
-	boolean keyDown, keyUp, keyLeft, keyRight, keyFire;
-	
-	// Frame controls
-	int frameCount = 0, frameRate = 0;
-	long startTime = System.currentTimeMillis();
-	
+	boolean keyDown, keyUp, keyLeft, keyRight, keyFire;	
 	
 	public GalacticWar() { 		
-		super("Galatic War");
-		
-		backBuffer = new BufferedImage(SCREENWIDTH, SCREENHEIGHT, BufferedImage.TYPE_INT_RGB);
-		g2d = backBuffer.createGraphics();
-		
-		// Set Background
+		super(FRAMERATE, SCREENWIDTH, SCREENHEIGHT);
+	}
+	
+	void gameStartup() {
 		background = new ImageEntity(this);
 		background.load("images/space.png");
 		
-		// Load explosion
-		explosion = new AnimatedSprite(this, g2d);
-		explosion.load("images/explosion.png", 1, 16, 60, 60);
-		explosion.setFrameDelay(2);
-		explosion.setAlive(false);
+		shipImage[0] = new ImageEntity(this);
+		shipImage[0].load("images/spaceship.png");
+		shipImage[1] = new ImageEntity(this);
+		shipImage[1].load("images/spaceship_thrust.png");
 		
-		// Initialize in-game objects
-		ship = new Sprite(this, g2d);
-		ship.load("images/spaceship.png");
+		AnimatedSprite ship = new AnimatedSprite(this, graphics());
+		ship.setSpriteType(SPRITE_SHIP);
+		ship.setImage(shipImage[0].getImage());
+		ship.setFrameWidth(ship.imageWidth());
+		ship.setFrameHeight(ship.imageHeight());
 		ship.setPosition(new Point2D(CENTERX, CENTERY));
 		ship.setAlive(true);
+		ship.setState(SPRITE_NORMAL);
+		sprites().add(ship);
 		
-		for(int i=0;i<BULLETS;i++) {
-			bullet[i] = new Sprite(this, g2d);
-			bullet[i].load("images/laser.png");
-		}
-
-		for(int j=0;j<ASTEROIDS;j++) {
-			ast[j] = new Sprite(this, g2d);
-			ast[j].setAlive(true);
-			
-			int i=rand.nextInt(5);
-			ast[j].load("images/asteroid.png");
-			
-			int x = rand.nextInt(SCREENWIDTH);
-			int y = rand.nextInt(SCREENHEIGHT);
-			ast[j].setPosition(new Point2D(x,y));
-			
-			ast[j].setFaceAngle(rand.nextInt(360));
-			ast[j].setMoveAngle(rand.nextInt(360));
-			ast[j].setRotationRate(rand.nextDouble());
-			
-			double ang = ast[j].moveAngle() - 90;			
-			double velx = calcAngleMoveX(ang);
-			double vely = calcAngleMoveY(ang);
-			ast[j].setVelocity(new Point2D(velx, vely));
-		}
+		bulletImage = new ImageEntity(this);
+		bulletImage.load("images/laser.png");
 		
-		shoot = new SoundClip("sounds/laser.wav");
-		explode = new SoundClip("sounds/explosion.wav");
+		explosions[0] = new ImageEntity(this);
 		
-		addKeyListener(this);
-		start();
-	
-		setSize(SCREENWIDTH, SCREENHEIGHT);
-		setVisible(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
 	/** 
