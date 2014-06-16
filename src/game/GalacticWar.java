@@ -94,371 +94,111 @@ public class GalacticWar extends Game {
 		bulletImage.load("images/laser.png");
 		
 		explosions[0] = new ImageEntity(this);
+		explosions[0].load("images/explosion.png");
+		explosions[1] = new ImageEntity(this);
+		explosions[1].load("images/explosion.png");	
 		
-	}
-	
-	/** 
-	 * THREAD METHODS
-	 */
-	public void start() {
-		gameloop = new Thread(this);
-		gameloop.start();
-	}
-	
-	public void run() {
-		Thread t = Thread.currentThread();
-		while(t == gameloop) {
-			try {
-				Thread.sleep(20);
-			} catch(InterruptedException e) {
-				e.printStackTrace();
-			}
-			gameUpdate(); 
-			repaint();
-		}
-	}
-	
-	public void stop() {
-		gameloop = null;
-	}	
-	
-	/**
-	 * GAME UPDATE METHODS
-	 */
-	private void gameUpdate() {
-		checkInput();
-		updateShip();
-		updateBullets();
-		updateAsteroids();
-		if (collisionTesting) {
-			checkCollisions();
-			handleShipCollisions();
-			handleBulletCollisions();
-			handleAsteroidCollisions();
-		}
-	}
-	
-	public void updateShip() {
-		ship.updatePosition();
-		double newx = ship.position().X();
-		double newy = ship.position().Y();
-
-		if(ship.position().X() < -10) {
-			newx = SCREENWIDTH + 10;
-		} else if (ship.position().X() > SCREENWIDTH + 10) {
-			newx = -10;
-		}
-
-		if(ship.position().Y() < -10) {
-			newy = SCREENHEIGHT + 10;
-		} else if (ship.position().Y() > SCREENHEIGHT + 10) {
-			newy = -10;
+		for(int n=0; n<5;n++) {
+			bigAsteriods[n] = new ImageEntity(this);
+			bigAsteriods[n].load("images/asteroid.png");
 		}
 		
-		ship.setPosition(new Point2D(newx,newy));
-		ship.setState(SPRITE_NORMAL);
-	}
-	
-	public void updateBullets() {
-		for (int n=0;n<BULLETS;n++) {
-			if (bullet[n].alive()) {
-				
-				bullet[n].updatePosition();
-				if(bullet[n].position().X() < 0 || bullet[n].position().X() > SCREENWIDTH) {
-					bullet[n].setAlive(false);
-				}
-
-				bullet[n].updatePosition();
-				if(bullet[n].position().Y() < 0 || bullet[n].position().Y() > SCREENHEIGHT) {
-					bullet[n].setAlive(false);
-				}
-				
-				bullet[n].setState(SPRITE_NORMAL);
-			}
+		for(int n=0; n<2;n++) {
+			medAsteriods[n] = new ImageEntity(this);
+			medAsteriods[n].load("images/asteroidmedium.png");
 		}
-	}
-	
-	public void updateAsteroids() {
-		for (int n=0;n<ASTEROIDS;n++) {
-			if (ast[n].alive()) {
-				ast[n].updatePosition();
-				ast[n].updateRotation();
-				
-				int w = ast[n].imageWidth()-1;
-				int h = ast[n].imageHeight()-1;
-				double newx = ast[n].position().X();
-				double newy = ast[n].position().Y();
-				
-				if (ast[n].position().X() < -w) {
-					newx = SCREENWIDTH + w;
-				} else if (ast[n].position().X() > SCREENWIDTH + w) {
-					newx = -w;
-				}
-				
-				if (ast[n].position().Y() < -h) {
-					newy = SCREENHEIGHT + h;
-				} else if (ast[n].position().Y() > SCREENHEIGHT + h) {
-					newy = -h;
-				}
-				
-				ast[n].setPosition(new Point2D(newx, newy));
-				ast[n].setState(SPRITE_NORMAL);
-			}
-		}	
-	}	
-	
-	public void checkCollisions() {
-		for(int m=0;m<ASTEROIDS;m++) {
-
-			if (ast[m].alive()) {
-				for(int n=0;n<BULLETS;n++) {
-					if(bullet[n].alive()) {
-						if (ast[m].collidesWith(bullet[n])){
-							bullet[n].setState(SPRITE_COLLIDED);
-							ast[m].setState(SPRITE_COLLIDED);
-							// explode.play();
-						}
-					}
-				}
-			}
-			
-			if(ship.collidesWith(ast[m])) {
-				ast[m].setState(SPRITE_COLLIDED);
-				ship.setState(SPRITE_COLLIDED);
-				// explode.play();
-			}
+		
+		for(int n=0; n<3;n++) {
+			smlAsteriods[n] = new ImageEntity(this);
+			smlAsteriods[n].load("images/asteroidsmall.png");
 		}
-	}	
-	
-	public void handleShipCollisions() {
-		if (ship.state() == SPRITE_COLLIDED) {
-			collisionTimer = System.currentTimeMillis();
-			ship.setVelocity(new Point2D(0,0));
-			ship.setState(SPRITE_EXPLODING);
-			startExplosion(ship);
-		} else if (ship.state() == SPRITE_EXPLODING) {
-			if(collisionTimer + 3000 < System.currentTimeMillis()) {
-				ship.setState(SPRITE_NORMAL);
-			}
+		
+		for(int n=0; n<4;n++) {
+			tnyAsteriods[n] = new ImageEntity(this);
+			tnyAsteriods[n].load("images/asteroidtiny.png");
 		}
-	}
 	
-	public void startExplosion(Sprite sprite) {
-		if(!explosion.alive()) {
-			double x = sprite.position().X() + sprite.getBounds().width/2;
-			double y = sprite.position().Y() + sprite.getBounds().height/2;			
-			Point2D tempPoint = new Point2D(x,y);
-			explosion.setPosition(tempPoint);
-			explosion.setAlive(true);
-		}
-	}
-	
-	public void handleBulletCollisions() {
-		for(int n=0;n<BULLETS;n++) {
-			if(bullet[n].state() == SPRITE_COLLIDED) {
-				
-			}
-		}
-	}
-	
-	public void handleAsteroidCollisions() {
 		for(int n=0;n<ASTEROIDS;n++) {
-			if(ast[n].state() == SPRITE_COLLIDED) {
-				
-			}
+			createAsteroid();
 		}
 	}
 	
 	/**
-	 *  PAINT METHODS
+	 * SPRITE METHODS
 	 */
-	public void paint(Graphics g) {
-		frameCount++;
-		if(System.currentTimeMillis() > startTime + 1000) {
-			startTime = System.currentTimeMillis();
-			frameRate = frameCount;
-			frameCount = 0;
+	public void spriteUpdate(AnimatedSprite sprite) {
+		switch(sprite.spriteType()) {
+		case SPRITE_SHIP:
+			warp(sprite);
+			break;
+		case SPRITE_BULLET:
+			warp(sprite);
+			break;
+		case SPRITE_EXPLOSION:
+			if(sprite.currentFrame() == sprite.totalFrames() -1) {
+				sprite.setAlive(false);
+			}
+			break;
+		case SPRITE_ASTEROID_BIG:
+		case SPRITE_ASTEROID_MEDIUM:
+		case SPRITE_ASTEROID_SMALL:
+		case SPRITE_ASTEROID_TINY:
+			warp(sprite);
+			break;
 		}
-		
-		g2d.setTransform(identity);
-		g2d.setPaint(Color.black);
-		g2d.fillRect(0, 0, SCREENWIDTH, SCREENHEIGHT);
-		
-		g2d.drawImage(background.getImage(), 0, 0, SCREENWIDTH - 1, SCREENHEIGHT - 1, this);
-		
-		drawShip();
-		drawBullets();
-		drawAsteroids();
-		drawExplosions();
-		g.drawImage(backBuffer, 0, 0, this);
-	}	
+	}
 	
-	public void drawShip() {
-		ship.transform();
-		ship.draw();
-		
-		if (showBounds) {
-			if (ship.state() == SPRITE_COLLIDED) {
-				ship.drawBounds(Color.RED);
+	public void spriteDraw(AnimatedSprite sprite) {
+		if(showBounds) {
+			if(sprite.collided()) {
+				sprite.drawBounds(Color.RED);
 			} else {
-				ship.drawBounds(Color.BLUE);
+				sprite.drawBounds(Color.BLUE);
 			}
 		}
 	}
 	
-	public void drawBullets() {
-		for (int n=0;n<BULLETS;n++) {
-			if (bullet[n].alive()) {
-				bullet[n].transform();
-				bullet[n].draw();
-				if (showBounds) {
-					if (bullet[n].state() == SPRITE_COLLIDED) {
-						bullet[n].drawBounds(Color.RED);
-					} else {
-						bullet[n].drawBounds(Color.BLUE);
+	public void spriteDying(AnimatedSprite sprite) {
+		// STUB
+	}
+	
+	public void spriteCollision(AnimatedSprite spr1, AnimatedSprite spr2) {
+		if (!collisionTesting) return;
+		switch (spr1.spriteType()) {
+		case SPRITE_BULLET: 
+			if(isAsteroid(spr2.spriteType())) {
+				spr1.setAlive(false);
+				spr2.setAlive(false);
+				breakAsteroid(spr2);
+			}
+			break;
+		case SPRITE_SHIP:
+			if(isAsteroid(spr2.spriteType())) {
+				if(spr1.state() == STATE_NORMAL) {
+					collisionTimer = System.currentTimeMillis();
+					spr1.setVelocity(new Point2D(0, 0));
+					double x = spr1.position().X() - 10;
+					double y = spr1.position().Y() - 10;
+					startBigExplosion(new Point2D(x, y));
+					spr1.setState(STATE_EXPLODING);
+					spr2.setAlive(false);
+					breakAsteroid(spr2);
+				} else if(spr1.state() == STATE_EXPLODING){
+					if(collisionTimer + 3000 < System.currentTimeMillis()) {
+						spr1.setState(STATE_NORMAL);
 					}
 				}
 			}
+			break;
 		}
 	}
 	
-	public void drawAsteroids() {
-		for(int n=0;n<ASTEROIDS;n++) {
-			if (ast[n].alive()) {
-				ast[n].transform();
-				ast[n].draw();
-				if (showBounds) {
-					if (ast[n].state() == SPRITE_COLLIDED) {
-						ast[n].drawBounds(Color.RED);
-					} else {
-						ast[n].drawBounds(Color.BLUE);
-					}
-				}
-			}
-		}
-	}
-	
-	public void drawExplosions() {
-		if (explosion.alive()) {
-			explosion.update();
-			if (explosion.currentFrame() == explosion.totalFrames() - 1) {
-				explosion.setCurrentFrame(0);
-				explosion.setAlive(false);
-			} else {
-				explosion.draw();
-			}
-		}
-	}
 	
 	/**
-	 * SHIP ACTIONS
+	 * KEYBOARD EVENTS
 	 */
-	
-	public void applyThrust() {
-		ship.setMoveAngle(ship.faceAngle() - 90);
-		double velx = ship.velocity().X();
-		velx+= calcAngleMoveX(ship.moveAngle()) * ACCELERATION;
-		double vely = ship.velocity().Y();
-		vely+= calcAngleMoveY(ship.moveAngle()) * ACCELERATION;
-		ship.setVelocity(new Point2D(velx, vely));
-	}
-	
-	public void fireBullet() {
-		currentBullet++;
-		if(currentBullet > BULLETS -1) currentBullet = 0;
-		bullet[currentBullet].setAlive(true);
+	public void gameKeyDown(int keyCode) {
 		
-		int w = bullet[currentBullet].imageWidth();
-		int h = bullet[currentBullet].imageHeight();
-		
-		double x = ship.center().X() - w/2;
-		double y = ship.center().Y() - w/2;
-		bullet[currentBullet].setPosition(new Point2D(x,y));
-		
-		bullet[currentBullet].setFaceAngle(ship.faceAngle());
-		bullet[currentBullet].setMoveAngle(ship.faceAngle() - 90);
-		
-		double angle = bullet[currentBullet].moveAngle();
-		double svx = calcAngleMoveX(angle) * BULLET_SPEED;
-		double svy = calcAngleMoveY(angle) * BULLET_SPEED;
-		bullet[currentBullet].setVelocity(new Point2D(svx, svy));
-		
-		shoot.play();
-	}
-	
-	/**
-	 * MOTION SUPPORT
-	 */
-	public double calcAngleMoveX(double angle) {
-		return (double) (Math.cos(angle * Math.PI / 180));
-	}
-	
-	public double calcAngleMoveY(double angle) {
-		return (double) (Math.sin(angle * Math.PI / 180));
-	}
-	
-	/** KEYBOARD **/
-	public void checkInput() {
-		if (keyLeft) {
-			ship.setFaceAngle(ship.faceAngle() - 5);
-			if (ship.faceAngle() < 0) ship.setFaceAngle(360-5);
-		} else if (keyRight) {
-			ship.setFaceAngle(ship.faceAngle() + 5);
-			if (ship.faceAngle() > 360) ship.setFaceAngle(5);
-		}
-		
-		if (keyUp) {
-			applyThrust();
-		}
-	}
-	
-	public void keyTyped(KeyEvent k) {}
-	public void keyReleased(KeyEvent k) {
-		int keyCode = k.getKeyCode();
-		switch (keyCode) {
-			case KeyEvent.VK_LEFT:
-				keyLeft = false;
-				break;
-			case KeyEvent.VK_RIGHT:
-				keyRight = false;
-				break;
-			case KeyEvent.VK_UP:
-				keyUp = false;
-				break;
-			case KeyEvent.VK_SPACE:
-				keyFire = false;
-				break;
-			case KeyEvent.VK_B: 
-				showBounds = !showBounds;
-				break;
-			case KeyEvent.VK_C:
-				collisionTesting = !collisionTesting;
-				break;
-		}
-	}
-	public void keyPressed(KeyEvent k) {
-		int keyCode = k.getKeyCode();
-		switch (keyCode) {
-			case KeyEvent.VK_LEFT:
-				keyLeft = true;
-				break;
-			case KeyEvent.VK_RIGHT:
-				keyRight = true;
-				break;
-			case KeyEvent.VK_UP:
-				keyUp = true;
-				break;
-			case KeyEvent.VK_SPACE:
-				keyFire = true;
-				fireBullet();
-				break;
-			case KeyEvent.VK_B: 
-				showBounds = !showBounds;
-				break;
-			case KeyEvent.VK_C:
-				collisionTesting = !collisionTesting;
-				break;
-		}
 	}
 	
 
