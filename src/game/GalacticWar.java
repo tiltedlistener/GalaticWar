@@ -198,8 +198,43 @@ public class GalacticWar extends Game {
 	 * KEYBOARD EVENTS
 	 */
 	public void gameKeyDown(int keyCode) {
-		
+		switch(keyCode) {
+		case KeyEvent.VK_LEFT:
+			keyLeft = true;
+			break;
+		case KeyEvent.VK_RIGHT:
+			keyRight = true;
+			break;
+		case KeyEvent.VK_UP:
+			keyUp = true;
+			break;	
+		case KeyEvent.VK_CONTROL:
+			keyFire = true;
+			break;
+		}
 	}
 	
+	public void gameKeyUp(int keyCode) {
+		switch(keyCode) {
+		case KeyEvent.VK_LEFT:
+			keyLeft = false;
+			break;
+		case KeyEvent.VK_RIGHT:
+			keyRight = false;
+			break;
+		case KeyEvent.VK_UP:
+			keyUp = false;
+			break;	
+		case KeyEvent.VK_CONTROL:
+			keyFire = false;
+			break;
+		}
+	}
+	
+	public void gameMouseDown() {}
+	public void gameMouseUp() {}
+	public void gameMouseMoved() {}
 
+	
+	
 }
