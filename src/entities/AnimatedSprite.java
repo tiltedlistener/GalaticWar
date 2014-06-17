@@ -171,4 +171,7 @@ public class AnimatedSprite {
 		position = point;
 	}
 	
+	public Point2D position() {
+		return position;
+	}
 }

@@ -40,10 +40,10 @@ public class GalacticWar extends Game {
 	
 	// Sprite types
 	final int SPRITE_SHIP = 1;
-	final int SPIRTE_ASTEROID_BIG = 10;
-	final int SPIRTE_ASTEROID_MEDIUM = 11;
-	final int SPIRTE_ASTEROID_SMALL = 12;
-	final int SPIRTE_ASTEROID_TINY = 13;
+	final int SPRITE_ASTEROID_BIG = 10;
+	final int SPRITE_ASTEROID_MEDIUM = 11;
+	final int SPRITE_ASTEROID_SMALL = 12;
+	final int SPRITE_ASTEROID_TINY = 13;
 	
 	// Images
 	ImageEntity background;
@@ -195,7 +195,7 @@ public class GalacticWar extends Game {
 	
 	
 	/**
-	 * KEYBOARD EVENTS
+	 * KEYBOARD AND MOUSE EVENTS
 	 */
 	public void gameKeyDown(int keyCode) {
 		switch(keyCode) {
@@ -235,6 +235,50 @@ public class GalacticWar extends Game {
 	public void gameMouseUp() {}
 	public void gameMouseMoved() {}
 
+	
+	/**
+	 * BREAK UP ASTEROIDS
+	 */
+	private void breakAsteroid(AnimatedSprite sprite) {
+		switch(sprite.spriteType()) {
+		case SPRITE_ASTEROID_BIG:
+			spawnAsteroid(sprite);
+			spawnAsteroid(sprite);
+			spawnAsteroid(sprite);
+			startBigExplosion(sprite.position());
+			break;
+		case SPRITE_ASTEROID_MEDIUM:
+			spawnAsteroid(sprite);
+			spawnAsteroid(sprite);
+			spawnAsteroid(sprite);
+			startSmallExplosion(sprite.position());
+			break;
+		case SPRITE_ASTEROID_SMALL:
+			spawnAsteroid(sprite);
+			spawnAsteroid(sprite);
+			spawnAsteroid(sprite);
+			startSmallExplosion(sprite.position());
+			break;
+		case SPRITE_ASTEROID_TINY:
+			spawnPowerup(sprite);
+			startBigExplosion(sprite.position());
+			break;
+		}
+	}
+	
+	private void spawnAsteroid(AnimatedSprite sprite) {
+		AnimatedSprite ast = new AnimatedSprite(this, graphics());
+		ast.setAlive(true);
+		
+		int w = sprite.getBounds().width;
+		int h = sprite.getBounds().height;
+		
+		double x = sprite.position().X() + w/2 + rand.nextInt(20) - 40;
+		double y = sprite.position().Y() + h/2 + rand.nextInt(20) - 40;
+		ast.setPosition(new Point2D(x,y));
+		
+		
+	}
 	
 	
 }
