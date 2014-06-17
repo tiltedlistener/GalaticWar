@@ -48,10 +48,10 @@ public class GalacticWar extends Game {
 	// Images
 	ImageEntity background;
 	ImageEntity bulletImage;
-	ImageEntity[] bigAsteriods = new ImageEntity[5];
-	ImageEntity[] medAsteriods = new ImageEntity[2];
-	ImageEntity[] smlAsteriods = new ImageEntity[3];
-	ImageEntity[] tnyAsteriods = new ImageEntity[4];
+	ImageEntity[] bigAsteroids = new ImageEntity[5];
+	ImageEntity[] medAsteroids = new ImageEntity[2];
+	ImageEntity[] smlAsteroids = new ImageEntity[3];
+	ImageEntity[] tnyAsteroids = new ImageEntity[4];
 	ImageEntity[] explosions = new ImageEntity[2];
 	ImageEntity[] shipImage = new ImageEntity[2];
 		
@@ -99,23 +99,23 @@ public class GalacticWar extends Game {
 		explosions[1].load("images/explosion.png");	
 		
 		for(int n=0; n<5;n++) {
-			bigAsteriods[n] = new ImageEntity(this);
-			bigAsteriods[n].load("images/asteroid.png");
+			bigAsteroids[n] = new ImageEntity(this);
+			bigAsteroids[n].load("images/asteroid.png");
 		}
 		
 		for(int n=0; n<2;n++) {
-			medAsteriods[n] = new ImageEntity(this);
-			medAsteriods[n].load("images/asteroidmedium.png");
+			medAsteroids[n] = new ImageEntity(this);
+			medAsteroids[n].load("images/asteroidmedium.png");
 		}
 		
 		for(int n=0; n<3;n++) {
-			smlAsteriods[n] = new ImageEntity(this);
-			smlAsteriods[n].load("images/asteroidsmall.png");
+			smlAsteroids[n] = new ImageEntity(this);
+			smlAsteroids[n].load("images/asteroidsmall.png");
 		}
 		
 		for(int n=0; n<4;n++) {
-			tnyAsteriods[n] = new ImageEntity(this);
-			tnyAsteriods[n].load("images/asteroidtiny.png");
+			tnyAsteroids[n] = new ImageEntity(this);
+			tnyAsteroids[n].load("images/asteroidtiny.png");
 		}
 	
 		for(int n=0;n<ASTEROIDS;n++) {
@@ -261,7 +261,7 @@ public class GalacticWar extends Game {
 			break;
 		case SPRITE_ASTEROID_TINY:
 			spawnPowerup(sprite);
-			startBigExplosion(sprite.position());
+			startSmallExplosion(sprite.position());
 			break;
 		}
 	}
@@ -277,8 +277,84 @@ public class GalacticWar extends Game {
 		double y = sprite.position().Y() + h/2 + rand.nextInt(20) - 40;
 		ast.setPosition(new Point2D(x,y));
 		
+		ast.setFaceAngle(rand.nextInt(360));
+		ast.setMoveAngle(rand.nextInt(360));
+		
+		double ang = ast.moveAngle() - 90;
+		double velx = calcAngleMoveX(ang);
+		double vely = calcAngleMoveY(ang);
+		ast.setVelocity(new Point2D(velx, vely));
+		
+		switch(sprite.spriteType()) {
+		case SPRITE_ASTEROID_BIG:
+			ast.setSpriteType(SPRITE_ASTEROID_MEDIUM);
+			int i = rand.nextInt(2);
+			ast.setImage(medAsteroids[i].getImage());
+			ast.setFrameWidth(medAsteroids[i].width());
+			ast.setFrameHeight(medAsteroids[i].height());
+			break;
+		case SPRITE_ASTEROID_MEDIUM:
+			ast.setSpriteType(SPRITE_ASTEROID_SMALL);		
+			int i = rand.nextInt(23;
+			ast.setImage(smlAsteroids[i].getImage());
+			ast.setFrameWidth(smlAsteroids[i].width());
+			ast.setFrameHeight(smlAsteroids[i].height());
+			break;
+		case SPRITE_ASTEROID_SMALL:
+			ast.setSpriteType(SPRITE_ASTEROID_TINY);
+			int i = rand.nextInt(4);
+			ast.setImage(tnyAsteroids[i].getImage());
+			ast.setFrameWidth(tnyAsteroids[i].width());
+			ast.setFrameHeight(tnyAsteroids[i].height());
+			break;					
+		}
+		
+		sprites().add(ast);
+	}
+		
+	
+	private void spawnPowerup(AnimatedSprite sprite) {
 		
 	}
+	
+	private void createAsteroid() {
+		AnimatedSprite ast = new AnimatedSprite(this, graphics());
+		ast.setAlive(true);
+		ast.setSpriteType(SPRITE_ASTEROID_MEDIUM);
+	
+		int i = rand.nextInt(5);
+		ast.setImage(bigAsteroids[i].getImage());
+		ast.setFrameWidth(bigAsteroids[i].width());
+		ast.setFrameHeight(bigAsteroids[i].height());
+		
+		double x = rand.nextInt(SCREENWIDTH - 128);
+		double y = rand.nextInt(SCREENHEIGHT - 128);
+		ast.setPosition(new Point2D(x,y));
+		
+		ast.setFaceAngle(rand.nextInt(360));
+		ast.setMoveAngle(rand.nextInt(360));
+		
+		double ang = ast.moveAngle() - 90;
+		double velx = calcAngleMoveX(ang);
+		double vely = calcAngleMoveY(ang);
+		ast.setVelocity(new Point2D(velx, vely));
+		
+		sprites().add(ast);
+	}
+	
+	private boolean isAsteroid(int spriteType) {
+		switch(spriteType) {
+		case SPRITE_ASTEROID_BIG:
+		case SPRITE_ASTEROID_MEDIUM:
+		case SPRITE_ASTEROID_SMALL:
+		case SPRITE_ASTEROID_TINY:
+			return true;
+		default: 
+			return false;
+		}
+	}
+		
+	
 	
 	
 }
