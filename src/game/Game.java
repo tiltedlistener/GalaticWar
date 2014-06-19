@@ -4,6 +4,7 @@ import entities.*;
 import entities.Point2D;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
@@ -18,7 +19,7 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 	
 	// Objects list
 	private LinkedList _sprites;
-	private LinkedList sprites() { return _sprites; }
+	protected LinkedList sprites() { return _sprites; }
 	
 	// Graphics rendering
 	private BufferedImage backBuffer;
@@ -43,7 +44,7 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 	
 	// Abstract methods subclasses will implement for their specific games
 	abstract void gameStartup();
-	abstract void gameTimedUpdate();
+	abstract void gameTimeUpdate();
 	abstract void gameRefreshScreen();
 	abstract void gameShutdown();
 	abstract void gameKeyDown(int keyCode);
@@ -57,11 +58,11 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 	abstract void spriteCollision(AnimatedSprite spr1, AnimatedSprite spr2);
 	
 	public Game(int frameRate, int width, int height) {
+		super("GALACTIC WAR");
 		this.desiredFrameRate = frameRate;
 		this.screenWidth = width;
 		this.screenHeight = height;
-		
-		
+		init();
 	}
 	
 	public Graphics2D graphics() { return g2d; }
@@ -79,6 +80,10 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 		addKeyListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		
+		setSize(this.screenWidth, this.screenHeight);
+		setVisible(true);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		gameStartup();
 	}
@@ -131,7 +136,7 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 	}
 	
 	/** KEYLISTENERS **/
-	public void keyTeyped(KeyEvent k) {}
+	public void keyTyped(KeyEvent k) {}
 	public void keyPressed(KeyEvent k) {
 		gameKeyDown(k.getKeyCode());
 	}
@@ -188,13 +193,17 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 		gameMouseMove();
 	}
 	
-	public void mouseExisted(MouseEvent e) {
+	public void mouseExited(MouseEvent e) {
 		mousePos.setX(e.getX());
 		mousePos.setY(e.getY());
 		gameMouseMove();
 	}
 	
 	public void mouseClicked(MouseEvent e) {
+		
+	}
+	
+	public void mouseMoved(MouseEvent e) {
 		
 	}
 	
@@ -220,13 +229,13 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 				spriteUpdate(spr);
 				spr.updateLifetime();
 				if(!spr.alive()) {
-					sprteDying(spr);
+					spriteDying(spr);
 				}
 			}
 		}
 	}
 	
-	protected void testColisions() {
+	protected void testCollisions() {
 		for (int first=0; first < _sprites.size(); first++) {
 			AnimatedSprite spr1 = (AnimatedSprite)_sprites.get(first);
 			if(spr1.alive()) {

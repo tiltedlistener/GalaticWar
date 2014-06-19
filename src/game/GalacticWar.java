@@ -2,14 +2,9 @@ package game;
 
 import entities.*;
 import entities.Point2D;
-import sound.*;
-
-import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
-import java.awt.image.*;
 import java.util.*;
 import java.lang.System;
 
@@ -27,9 +22,9 @@ public class GalacticWar extends Game {
 	static int CENTERY = SCREENHEIGHT / 2;
 	
 	// Sprite states
-	static int SPRITE_NORMAL = 0;
-	static int SPRITE_COLLIDED = 1;
-	static int SPRITE_EXPLODING = 2;
+	static int STATE_NORMAL = 0;
+	static int STATE_COLLIDED = 1;
+	static int STATE_EXPLODING = 2;
 	
 	// Game objects
 	static int ASTEROIDS = 10;	
@@ -40,6 +35,8 @@ public class GalacticWar extends Game {
 	
 	// Sprite types
 	final int SPRITE_SHIP = 1;
+	final int SPRITE_BULLET = 2;
+	final int SPRITE_EXPLOSION = 3;
 	final int SPRITE_ASTEROID_BIG = 10;
 	final int SPRITE_ASTEROID_MEDIUM = 11;
 	final int SPRITE_ASTEROID_SMALL = 12;
@@ -74,20 +71,22 @@ public class GalacticWar extends Game {
 	void gameStartup() {
 		background = new ImageEntity(this);
 		background.load("images/space.png");
-		
+			
 		shipImage[0] = new ImageEntity(this);
 		shipImage[0].load("images/spaceship.png");
+		
+/**
 		shipImage[1] = new ImageEntity(this);
 		shipImage[1].load("images/spaceship_thrust.png");
 		
 		AnimatedSprite ship = new AnimatedSprite(this, graphics());
 		ship.setSpriteType(SPRITE_SHIP);
-		ship.setImage(shipImage[0].getImage());
-		ship.setFrameWidth(ship.imageWidth());
-		ship.setFrameHeight(ship.imageHeight());
+		ship.setImage(shipImage[0]);
+		ship.setFrameWidth(ship.getWidth());
+		ship.setFrameHeight(ship.getHeight());
 		ship.setPosition(new Point2D(CENTERX, CENTERY));
 		ship.setAlive(true);
-		ship.setState(SPRITE_NORMAL);
+		ship.setState(STATE_NORMAL);
 		sprites().add(ship);
 		
 		bulletImage = new ImageEntity(this);
@@ -121,6 +120,20 @@ public class GalacticWar extends Game {
 		for(int n=0;n<ASTEROIDS;n++) {
 			createAsteroid();
 		}
+		**/
+		
+	}
+	
+	public void gameShutdown() {
+		
+	}
+	
+	public void gameTimeUpdate() {
+		
+	}
+	
+	public void gameRefreshScreen() {
+		
 	}
 	
 	/**
@@ -233,7 +246,7 @@ public class GalacticWar extends Game {
 	
 	public void gameMouseDown() {}
 	public void gameMouseUp() {}
-	public void gameMouseMoved() {}
+	public void gameMouseMove() {}
 
 	
 	/**
@@ -284,26 +297,24 @@ public class GalacticWar extends Game {
 		double velx = calcAngleMoveX(ang);
 		double vely = calcAngleMoveY(ang);
 		ast.setVelocity(new Point2D(velx, vely));
+		int i = rand.nextInt(2);
 		
 		switch(sprite.spriteType()) {
 		case SPRITE_ASTEROID_BIG:
 			ast.setSpriteType(SPRITE_ASTEROID_MEDIUM);
-			int i = rand.nextInt(2);
-			ast.setImage(medAsteroids[i].getImage());
+			ast.setImage(medAsteroids[i]);
 			ast.setFrameWidth(medAsteroids[i].width());
 			ast.setFrameHeight(medAsteroids[i].height());
 			break;
 		case SPRITE_ASTEROID_MEDIUM:
 			ast.setSpriteType(SPRITE_ASTEROID_SMALL);		
-			int i = rand.nextInt(23;
-			ast.setImage(smlAsteroids[i].getImage());
+			ast.setImage(smlAsteroids[i]);
 			ast.setFrameWidth(smlAsteroids[i].width());
 			ast.setFrameHeight(smlAsteroids[i].height());
 			break;
 		case SPRITE_ASTEROID_SMALL:
 			ast.setSpriteType(SPRITE_ASTEROID_TINY);
-			int i = rand.nextInt(4);
-			ast.setImage(tnyAsteroids[i].getImage());
+			ast.setImage(tnyAsteroids[i]);
 			ast.setFrameWidth(tnyAsteroids[i].width());
 			ast.setFrameHeight(tnyAsteroids[i].height());
 			break;					
@@ -323,7 +334,7 @@ public class GalacticWar extends Game {
 		ast.setSpriteType(SPRITE_ASTEROID_MEDIUM);
 	
 		int i = rand.nextInt(5);
-		ast.setImage(bigAsteroids[i].getImage());
+		ast.setImage(bigAsteroids[i]);
 		ast.setFrameWidth(bigAsteroids[i].width());
 		ast.setFrameHeight(bigAsteroids[i].height());
 		
@@ -354,7 +365,125 @@ public class GalacticWar extends Game {
 		}
 	}
 		
+	/**
+	 * Process Keys
+	 */
+	public void checkInput() {
+		AnimatedSprite ship = (AnimatedSprite)sprites().get(0);
+		if(keyLeft) {
+			ship.setFaceAngle(ship.faceAngle() - SHIPROTATION);
+			if(ship.faceAngle() < 0) {
+				ship.setFaceAngle(360 - SHIPROTATION);
+			}
+		}
+		else if(keyRight) {
+			ship.setFaceAngle(ship.faceAngle() + SHIPROTATION);
+			if(ship.faceAngle() > 0) {
+				ship.setFaceAngle(SHIPROTATION);
+			}
+		}
+		
+		if (keyUp) {
+			ship.setImage(shipImage[1]);
+		} else {
+			ship.setImage(shipImage[0]);
+		}
+	}
 	
+	public void applyThrust() {
+		AnimatedSprite ship = (AnimatedSprite)sprites().get(0);
+		ship.setMoveAngle(ship.faceAngle() - 90);
+		
+		double velx = ship.velocity().X();
+		velx+= calcAngleMoveX(ship.moveAngle()) * ACCELERATION;
+		
+		double vely = ship.velocity().Y();
+		vely+= calcAngleMoveY(ship.moveAngle()) * ACCELERATION;
+		
+		if (velx < -10) {
+			velx = -10;
+		} else if (velx > 10) {
+			velx = 10;
+		}
+		
+		if (vely < -10) {
+			vely = -10;
+		} else if (vely > 10) {
+			vely = 10;
+		}
+		
+		ship.setVelocity(new Point2D(velx, vely));
+	}
 	
+	public void fireBullets() {
+		AnimatedSprite ship = (AnimatedSprite)sprites().get(0);
+		
+		AnimatedSprite bullet = new AnimatedSprite(this, graphics());
+		bullet.setImage(bulletImage);
+		bullet.setFrameWidth(bulletImage.width());
+		bullet.setFrameHeight(bulletImage.height());
+		bullet.setSpriteType(SPRITE_BULLET);
+		bullet.setAlive(true);
+		bullet.setLifespan(200);
+		bullet.setFaceAngle(ship.faceAngle());
+		bullet.setMoveAngle(ship.faceAngle() - 90);
+		
+		double x = ship.center().X() - bullet.getWidth() / 2;
+		double y = ship.center().Y() - bullet.getHeight() / 2;
+		bullet.setPosition(new Point2D(x, y));
+		
+		double angle = bullet.moveAngle();
+		double svx = calcAngleMoveX(angle) * BULLET_SPEED;
+		double svy = calcAngleMoveY(angle) * BULLET_SPEED;
+		bullet.setVelocity(new Point2D(svx, svy));
+		
+		sprites().add(bullet);
+	}
 	
+	/**
+	 * Draw methods
+	 */
+	public void warp(AnimatedSprite spr) {
+		int w = spr.frameWidth() -1;
+		int h = spr.frameHeight() -1;
+	
+		if (spr.position().X() < 0-w) {
+			spr.position().setX(SCREENWIDTH);
+		} else if (spr.position().X() > SCREENWIDTH) {
+			spr.position().setX(0-w);
+		}
+		
+		if (spr.position().Y() < 0-h) {
+			spr.position().setY(SCREENHEIGHT);
+		} else if (spr.position().Y() > SCREENHEIGHT) {
+			spr.position().setY(0-h);
+		}
+	}
+	
+	public void startBigExplosion(Point2D pos) {
+		AnimatedSprite expl = new AnimatedSprite(this, graphics());
+		expl.setSpriteType(SPRITE_EXPLOSION);
+		expl.setAlive(true);
+		expl.setImage(explosions[0]);
+		expl.setTotalFrames(16);
+		expl.setColumns(1);
+		expl.setFrameWidth(60);
+		expl.setFrameHeight(60);
+		expl.setFrameDelay(2);
+		expl.setPosition(pos);
+	}
+	
+	public void startSmallExplosion(Point2D pos) {
+		AnimatedSprite expl = new AnimatedSprite(this, graphics());
+		expl.setSpriteType(SPRITE_EXPLOSION);
+		expl.setAlive(true);
+		expl.setImage(explosions[0]);
+		expl.setTotalFrames(16);
+		expl.setColumns(1);
+		expl.setFrameWidth(60);
+		expl.setFrameHeight(60);
+		expl.setFrameDelay(2);
+		expl.setPosition(pos);
+	}
+
 }

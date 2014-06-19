@@ -9,8 +9,9 @@ import javax.swing.*;
 public class AnimatedSprite {
 	protected JFrame frame;
 	protected Graphics2D g2d;
-	protected Image image;
+	protected ImageEntity image;
 	public boolean alive;
+	public boolean collided;
 	public Point2D position;
 	public Point2D velocity;
 	public double rotationRate;
@@ -20,6 +21,10 @@ public class AnimatedSprite {
 	public int frameCount, frameDelay;
 	public int frameWidth, frameHeight, columns;
 	public double moveAngle, faceAngle;
+	
+	public int spriteType;
+	public int spriteState;
+	public int lifespan;
 	
 	public AnimatedSprite(JFrame _frame, Graphics2D _g2d) {
 		frame = _frame;
@@ -45,11 +50,11 @@ public class AnimatedSprite {
 	public JFrame getJFrame() { return frame; }
 	public Graphics2D getGraphics() { return g2d; }
 	public void setGraphics(Graphics2D _g2d) { g2d = _g2d; }
-	public void setIMage(Image _image) { image = _image; }
+	public void setImage(ImageEntity _image) { image = _image; }
 	
 	public int getWidth() {
 		if (image != null) {
-			return image.getWidth(frame);
+			return image.width();
 		} else {
 			return 0;
 		}
@@ -57,10 +62,38 @@ public class AnimatedSprite {
 	
 	public int getHeight() {
 		if (image != null) {
-			return image.getHeight(frame);
+			return image.height();
 		} else {
 			return 0;
 		}
+	}
+	
+	/**
+	 * Frame methods
+	 */
+	public void setFrameWidth(int frameWidth) {
+		this.frameWidth = frameWidth;
+	}
+	
+	public void setFrameHeight(int frameHeight) {
+		this.frameHeight = frameHeight;
+	}
+	public int frameWidth() { return frameWidth; }
+	public int frameHeight() { return frameHeight; }
+	
+	public void setColumns(int columns) {
+		this.columns = columns;
+	}
+	
+	public void setTotalFrames(int frames) {
+		this.totalFrames = frames;
+	}
+	
+	/**
+	 * Position relations
+	 */
+	public Point2D center() {
+		return new Point2D(getCenterX(), getCenterY());
 	}
 	
 	public double getCenterX() {
@@ -83,8 +116,9 @@ public class AnimatedSprite {
 	
 	public void load(String filename, int _columns, int _totalFrames, int _width, int _height) {
 		Toolkit tk = Toolkit.getDefaultToolkit();
-		image = tk.getImage(filename);
-		while(image.getWidth(frame) <= 0);
+		Image tempImage = tk.getImage(filename);
+		while(tempImage.getWidth(frame) <= 0);
+		image.setImage(tempImage);
 		columns = _columns;
 		totalFrames = _totalFrames;
 		frameWidth = _width;
@@ -92,12 +126,29 @@ public class AnimatedSprite {
 	}
 	
 	public void draw() {
-		update();
 		int fx = (currentFrame % columns) * frameWidth;
 		int fy = (currentFrame / columns) * frameHeight;
-		
-		g2d.drawImage(image, (int)position.X(), (int)position.Y(), (int)position.X() + frameWidth, (int)position.Y() + frameHeight, fx, fy, fx+frameWidth, fy+frameHeight, getJFrame());
+		g2d.drawImage(image.getImage(), (int)position.X(), (int)position.Y(), (int)position.X() + frameWidth, (int)position.Y() + frameHeight, fx, fy, fx+frameWidth, fy+frameHeight, getJFrame());
 	}	
+	
+	public void updateFrame() {
+		if (totalFrames > 1) {
+			frameCount++;
+			if(frameCount > frameDelay) {
+				frameCount = 0;
+				currentFrame += animationDirection;
+				if(currentFrame > totalFrames - 1) {
+					currentFrame = 0;
+				} else if (currentFrame < 0) {
+					currentFrame = totalFrames - 1;
+				}
+			}		
+		}
+	}
+	
+	public void transform() {
+		image.transform();
+	}
 	
 	public void update() {
 		position.x += velocity.x;
@@ -126,6 +177,46 @@ public class AnimatedSprite {
 		}
 	}
 	
+	public void updatePosition() {
+		position.x += velocity.x;
+		position.y += velocity.y;
+
+	}
+	
+	public void updateRotation() {
+		if (rotationRate > 0.0) {
+			faceAngle += rotationRate;
+			if(faceAngle < 0) {
+				faceAngle = 360 - rotationRate;
+			} else if (faceAngle > 360) {
+				faceAngle = rotationRate;
+			}
+		}
+	}
+	
+	public void updateAnimation() {
+		if (totalFrames > 1) {
+			frameCount++;
+			if(frameCount > frameDelay) {
+				frameCount = 0;
+				currentFrame += animationDirection;
+				if(currentFrame > totalFrames - 1) {
+					currentFrame = 0;
+				} else if (currentFrame < 0) {
+					currentFrame = totalFrames - 1;
+				}
+			}		
+		}
+	}
+	
+	public void setLifespan(int span) {
+		lifespan = span;
+	}
+	
+	public void updateLifetime() {
+		lifespan -= 1;
+	}
+	
 	public void drawBounds(Color c) {
 		g2d.setColor(c);
 		g2d.draw(getBounds());
@@ -133,6 +224,10 @@ public class AnimatedSprite {
 	
 	public boolean collidesWith(Rectangle rect) {
 		return (rect.intersects(getBounds()));
+	}
+	
+	public boolean collidesWith(AnimatedSprite sprite) {
+		return (getBounds().intersects(sprite.getBounds()));
 	}
 	
 	public boolean collidesWith(Sprite sprite) {
@@ -167,6 +262,9 @@ public class AnimatedSprite {
 		return this.currentFrame;
 	}
 	
+	/**
+	 * Position and Motion variables
+	 */
 	public void setPosition(Point2D point) {
 		position = point;
 	}
@@ -174,4 +272,41 @@ public class AnimatedSprite {
 	public Point2D position() {
 		return position;
 	}
+	
+	public void setVelocity(Point2D vel) {
+		this.velocity = vel;
+	}
+	public Point2D velocity() { return this.velocity; }
+	
+	public void setFaceAngle(double faceAngle) {
+		this.faceAngle = faceAngle;
+	}
+
+	public void setMoveAngle(double moveAngle) {
+		this.moveAngle = moveAngle;
+	}
+	
+	public double moveAngle() { return this.moveAngle; }
+	public double faceAngle() { return this.faceAngle; }
+	
+	/**
+	 * Game State
+	 */
+	public void setSpriteType(int type) {
+		spriteType = type;
+	}
+	
+	public int spriteType() {
+		return spriteType;
+	}
+	
+	public void setState(int state) {
+		spriteState = state;
+	}
+	public int state() { return this.spriteState; }
+	
+	public void setCollided(boolean collided) {
+		this.collided = collided;
+	}
+	public boolean collided() { return this.collided; }
 }
