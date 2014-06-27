@@ -45,19 +45,19 @@ public class GalacticWar extends Game {
 	// Images
 	ImageEntity background;
 	ImageEntity bulletImage;
-	ImageEntity[] bigAsteroids = new ImageEntity[5];
-	ImageEntity[] medAsteroids = new ImageEntity[2];
-	ImageEntity[] smlAsteroids = new ImageEntity[3];
-	ImageEntity[] tnyAsteroids = new ImageEntity[4];
-	ImageEntity[] explosions = new ImageEntity[2];
-	ImageEntity[] shipImage = new ImageEntity[2];
-		
+	ImageEntity[] bigAsteroids;
+	ImageEntity[] medAsteroids;
+	ImageEntity[] smlAsteroids;
+	ImageEntity[] tnyAsteroids;
+	ImageEntity[] explosions;
+	ImageEntity[] shipImage;
+	
 	// Support
-	AffineTransform identity = new AffineTransform();
-	Random rand = new Random();
+	AffineTransform identity;
+	Random rand;
 	
 	// Dev support
-	boolean showBounds = false;
+	boolean showBounds = true;
 	boolean collisionTesting = true;
 	long collisionTimer = 0;
 	
@@ -69,13 +69,21 @@ public class GalacticWar extends Game {
 	}
 	
 	void gameStartup() {
+		identity = new AffineTransform();
+		rand = new Random();
+		bigAsteroids = new ImageEntity[5];
+		medAsteroids = new ImageEntity[2];
+		smlAsteroids = new ImageEntity[3];
+		tnyAsteroids = new ImageEntity[4];
+		explosions = new ImageEntity[2];
+		shipImage = new ImageEntity[2];
+		
 		background = new ImageEntity(this);
 		background.load("images/space.png");
 			
 		shipImage[0] = new ImageEntity(this);
 		shipImage[0].load("images/spaceship.png");
 		
-/**
 		shipImage[1] = new ImageEntity(this);
 		shipImage[1].load("images/spaceship_thrust.png");
 		
@@ -101,7 +109,7 @@ public class GalacticWar extends Game {
 			bigAsteroids[n] = new ImageEntity(this);
 			bigAsteroids[n].load("images/asteroid.png");
 		}
-		
+
 		for(int n=0; n<2;n++) {
 			medAsteroids[n] = new ImageEntity(this);
 			medAsteroids[n].load("images/asteroidmedium.png");
@@ -120,8 +128,8 @@ public class GalacticWar extends Game {
 		for(int n=0;n<ASTEROIDS;n++) {
 			createAsteroid();
 		}
-		**/
-		
+
+		start();
 	}
 	
 	public void gameShutdown() {
@@ -133,7 +141,7 @@ public class GalacticWar extends Game {
 	}
 	
 	public void gameRefreshScreen() {
-		
+		// This is sort of a confusing function since the pain method in the parent class is handling the refresh. f
 	}
 	
 	/**
@@ -211,6 +219,7 @@ public class GalacticWar extends Game {
 	 * KEYBOARD AND MOUSE EVENTS
 	 */
 	public void gameKeyDown(int keyCode) {
+		
 		switch(keyCode) {
 		case KeyEvent.VK_LEFT:
 			keyLeft = true;
@@ -221,13 +230,14 @@ public class GalacticWar extends Game {
 		case KeyEvent.VK_UP:
 			keyUp = true;
 			break;	
-		case KeyEvent.VK_CONTROL:
+		case KeyEvent.VK_SPACE:
 			keyFire = true;
 			break;
 		}
 	}
 	
 	public void gameKeyUp(int keyCode) {
+
 		switch(keyCode) {
 		case KeyEvent.VK_LEFT:
 			keyLeft = false;
@@ -238,7 +248,7 @@ public class GalacticWar extends Game {
 		case KeyEvent.VK_UP:
 			keyUp = false;
 			break;	
-		case KeyEvent.VK_CONTROL:
+		case KeyEvent.VK_SPACE:
 			keyFire = false;
 			break;
 		}
@@ -333,7 +343,7 @@ public class GalacticWar extends Game {
 		ast.setAlive(true);
 		ast.setSpriteType(SPRITE_ASTEROID_MEDIUM);
 	
-		int i = rand.nextInt(5);
+		int i = 1;		
 		ast.setImage(bigAsteroids[i]);
 		ast.setFrameWidth(bigAsteroids[i].width());
 		ast.setFrameHeight(bigAsteroids[i].height());
@@ -385,8 +395,13 @@ public class GalacticWar extends Game {
 		
 		if (keyUp) {
 			ship.setImage(shipImage[1]);
+			applyThrust();
 		} else {
 			ship.setImage(shipImage[0]);
+		}
+		
+		if (keyFire) {
+			fireBullets();
 		}
 	}
 	

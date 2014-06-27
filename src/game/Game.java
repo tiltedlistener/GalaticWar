@@ -56,6 +56,7 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 	abstract void spriteDraw(AnimatedSprite sprite);
 	abstract void spriteDying(AnimatedSprite sprite);
 	abstract void spriteCollision(AnimatedSprite spr1, AnimatedSprite spr2);
+	abstract void checkInput(); 
 	
 	public Game(int frameRate, int width, int height) {
 		super("GALACTIC WAR");
@@ -80,21 +81,18 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 		addKeyListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		
-		setSize(this.screenWidth, this.screenHeight);
-		setVisible(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+				
 		gameStartup();
 	}
 	
 	public void paint(Graphics g) {
+		g2d.clearRect(0, 0, this.screenWidth, this.screenHeight);
+		
 		_frameCount++;
 		if(System.currentTimeMillis() > startTime + 1000) {
 			startTime = System.currentTimeMillis();
 			_frameRate = _frameCount;
 			_frameCount = 0;
-			
 			purgeSprites();
 		}
 		
@@ -107,7 +105,13 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 		g.drawImage(backBuffer, 0, 0, this);
 	}	
 	
-	public void start() {
+	public void start() {		
+		// Show the screen
+		setSize(this.screenWidth, this.screenHeight);
+		setVisible(true);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		// Fire in the hole
 		gameLoop = new Thread(this);
 		gameLoop.start();
 	}
@@ -120,9 +124,11 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 			} catch(InterruptedException e) {
 				e.printStackTrace();
 			}
+			
 			if (!gamePaused()) {
 				updateSprites();
 				testCollisions();
+				checkInput();
 			}
 			
 			gameTimeUpdate();
