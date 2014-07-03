@@ -388,7 +388,7 @@ public class GalacticWar extends Game {
 		}
 		else if(keyRight) {
 			ship.setFaceAngle(ship.faceAngle() + SHIPROTATION);
-			if(ship.faceAngle() > 0) {
+			if(ship.faceAngle() > 360) {
 				ship.setFaceAngle(SHIPROTATION);
 			}
 		}
