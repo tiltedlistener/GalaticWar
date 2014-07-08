@@ -226,10 +226,6 @@ public class AnimatedSprite {
 	public boolean collidesWith(AnimatedSprite sprite) {
 		return (getBounds().intersects(sprite.getBounds()));
 	}
-	
-	public boolean collidesWith(Sprite sprite) {
-		return (getBounds().intersects(sprite.getBounds()));
-	}
 
 	public boolean collidesWith(Point point) {
 		return (getBounds().contains(point.x, point.y));

@@ -59,7 +59,7 @@ public class GalacticWar extends Game {
 	Random rand;
 	
 	// Dev support
-	boolean showBounds = true;
+	boolean showBounds = false;
 	boolean collisionTesting = true;
 	long collisionTimer = 0;
 	
