@@ -129,7 +129,6 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 			if (!gamePaused()) {
 				updateSprites();
 				testCollisions();
-				checkInput();		// ADDED there was no point where "checkInput" was called in the book
 			}
 			
 			gameTimeUpdate();

@@ -286,6 +286,10 @@ public class AnimatedSprite {
 	public double moveAngle() { return this.moveAngle; }
 	public double faceAngle() { return this.faceAngle; }
 	
+	public void setRotationRate(double rate){
+		// STUB 
+	}
+	
 	/**
 	 * Game State
 	 */

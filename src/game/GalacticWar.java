@@ -20,25 +20,25 @@ public class GalacticWar extends Game {
 	static int FRAMERATE = 60;
 	static int SCREENWIDTH = 800;
 	static int SCREENHEIGHT = 600;
+	
 	static int CENTERX = SCREENWIDTH / 2;
 	static int CENTERY = SCREENHEIGHT / 2;
 	
 	// Sprite states
-	static int STATE_NORMAL = 0;
-	static int STATE_COLLIDED = 1;
-	static int STATE_EXPLODING = 2;
+	final static int STATE_NORMAL = 0;
+	final static int STATE_COLLIDED = 1;
+	final static int STATE_EXPLODING = 2;
 	
 	// Game objects
-	static int ASTEROIDS = 10;	
-	static int BULLETS = 10;
-	static int BULLET_SPEED = 4;
-	static double ACCELERATION = 0.05;
-	static double SHIPROTATION = 5.0;
+	final static int ASTEROIDS = 10;	
+	final static int BULLET_SPEED = 4;
+	final static double ACCELERATION = 0.05;
+	final static double SHIPROTATION = 5.0;
 	
 	// Sprite types
 	final int SPRITE_SHIP = 1;
-	final int SPRITE_BULLET = 2;
-	final int SPRITE_EXPLOSION = 3;
+	final int SPRITE_BULLET = 100;
+	final int SPRITE_EXPLOSION = 200;
 	final int SPRITE_ASTEROID_BIG = 10;
 	final int SPRITE_ASTEROID_MEDIUM = 11;
 	final int SPRITE_ASTEROID_SMALL = 12;
@@ -85,7 +85,6 @@ public class GalacticWar extends Game {
 			
 		shipImage[0] = new ImageEntity(this);
 		shipImage[0].load("images/spaceship.png");
-		
 		shipImage[1] = new ImageEntity(this);
 		shipImage[1].load("images/spaceship_thrust.png");
 		
@@ -139,11 +138,16 @@ public class GalacticWar extends Game {
 	}
 	
 	public void gameTimeUpdate() {
-		
+		checkInput();
 	}
 	
 	public void gameRefreshScreen() {
-		// This is sort of a confusing function since the pain method in the parent class is handling the refresh. f
+		Graphics2D g2d = graphics();
+		
+		// AnimatedSprite ship = (AnimatedSprite)sprites().get(0);
+		g2d.drawImage(background.getImage(), 0,0, SCREENWIDTH - 1, SCREENHEIGHT - 1, this);
+		
+		// UNUSED from the book - dispensing with the status printing and therefore the ship object above
 	}
 	
 	/**
@@ -174,7 +178,7 @@ public class GalacticWar extends Game {
 	public void spriteDraw(AnimatedSprite sprite) {
 		if(showBounds) {
 			if(sprite.collided()) {
-				sprite.drawBounds(Color.RED);
+				sprite.drawBounds(Color.RED);		// TODO - this currently isn't firing though some collisions are
 			} else {
 				sprite.drawBounds(Color.BLUE);
 			}
@@ -187,6 +191,7 @@ public class GalacticWar extends Game {
 	
 	public void spriteCollision(AnimatedSprite spr1, AnimatedSprite spr2) {
 		if (!collisionTesting) return;
+		
 		switch (spr1.spriteType()) {
 		case SPRITE_BULLET: 
 			if(isAsteroid(spr2.spriteType())) {
@@ -236,6 +241,8 @@ public class GalacticWar extends Game {
 			keyFire = true;
 			break;
 		}
+		
+		// I have removed the optional turn on bounds and collision testing
 	}
 	
 	public void gameKeyUp(int keyCode) {
@@ -252,6 +259,7 @@ public class GalacticWar extends Game {
 			break;	
 		case KeyEvent.VK_SPACE:
 			keyFire = false;
+			fireBullets();
 			break;
 		}
 	}
@@ -304,13 +312,14 @@ public class GalacticWar extends Game {
 		
 		ast.setFaceAngle(rand.nextInt(360));
 		ast.setMoveAngle(rand.nextInt(360));
+		ast.setRotationRate(rand.nextDouble());
 		
 		double ang = ast.moveAngle() - 90;
 		double velx = calcAngleMoveX(ang);
 		double vely = calcAngleMoveY(ang);
 		ast.setVelocity(new Point2D(velx, vely));
-		int i = rand.nextInt(2);
 		
+		int i = 0;				// I've dispensed with having random asteroids, so here, I just set a baseline 
 		switch(sprite.spriteType()) {
 		case SPRITE_ASTEROID_BIG:
 			ast.setSpriteType(SPRITE_ASTEROID_MEDIUM);
@@ -343,9 +352,9 @@ public class GalacticWar extends Game {
 	private void createAsteroid() {
 		AnimatedSprite ast = new AnimatedSprite(this, graphics());
 		ast.setAlive(true);
-		ast.setSpriteType(SPRITE_ASTEROID_MEDIUM);
+		ast.setSpriteType(SPRITE_ASTEROID_BIG);
 	
-		int i = 1;		
+		int i = 0;		
 		ast.setImage(bigAsteroids[i]);
 		ast.setFrameWidth(bigAsteroids[i].width());
 		ast.setFrameHeight(bigAsteroids[i].height());
@@ -356,6 +365,7 @@ public class GalacticWar extends Game {
 		
 		ast.setFaceAngle(rand.nextInt(360));
 		ast.setMoveAngle(rand.nextInt(360));
+		ast.setRotationRate(rand.nextDouble());
 		
 		double ang = ast.moveAngle() - 90;
 		double velx = calcAngleMoveX(ang);
@@ -382,6 +392,7 @@ public class GalacticWar extends Game {
 	 */
 	public void checkInput() {
 		AnimatedSprite ship = (AnimatedSprite)sprites().get(0);
+		
 		if(keyLeft) {
 			ship.setFaceAngle(ship.faceAngle() - SHIPROTATION);
 			if(ship.faceAngle() < 0) {
@@ -402,9 +413,6 @@ public class GalacticWar extends Game {
 			ship.setImage(shipImage[0]);
 		}
 		
-		if (keyFire) {
-			fireBullets();
-		}
 	}
 	
 	public void applyThrust() {
@@ -488,6 +496,8 @@ public class GalacticWar extends Game {
 		expl.setFrameHeight(60);
 		expl.setFrameDelay(2);
 		expl.setPosition(pos);
+		
+		sprites().add(expl);
 	}
 	
 	public void startSmallExplosion(Point2D pos) {
@@ -501,6 +511,8 @@ public class GalacticWar extends Game {
 		expl.setFrameHeight(60);
 		expl.setFrameDelay(2);
 		expl.setPosition(pos);
+		
+		sprites().add(expl);
 	}
 
 }
