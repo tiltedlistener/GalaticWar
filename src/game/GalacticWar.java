@@ -453,8 +453,8 @@ public class GalacticWar extends Game {
 		bullet.setFaceAngle(ship.faceAngle());
 		bullet.setMoveAngle(ship.faceAngle() - 90);
 		
-		double x = ship.center().X() - bullet.getWidth() / 2;
-		double y = ship.center().Y() - bullet.getHeight() / 2;
+		double x = ship.getCenter().X() - bullet.getWidth() / 2;
+		double y = ship.getCenter().Y() - bullet.getHeight() / 2;
 		bullet.setPosition(new Point2D(x, y));
 		
 		double angle = bullet.moveAngle();

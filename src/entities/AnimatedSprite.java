@@ -4,9 +4,10 @@ import java.awt.*;
 import javax.swing.*;
 
 public class AnimatedSprite {
+	
 	protected JFrame frame;
 	protected Graphics2D g2d;
-	protected ImageEntity image;
+	protected ImageEntity image;		// Using ImageEntity instead of image
 	public boolean alive;
 	public boolean collided;
 	public Point2D position;
@@ -47,6 +48,7 @@ public class AnimatedSprite {
 	public JFrame getJFrame() { return frame; }
 	public Graphics2D getGraphics() { return g2d; }
 	public void setGraphics(Graphics2D _g2d) { g2d = _g2d; }
+	
 	public void setImage(ImageEntity _image) { image = _image; }
 	
 	public int getWidth() {
@@ -89,9 +91,6 @@ public class AnimatedSprite {
 	/**
 	 * Position relations
 	 */
-	public Point2D center() {
-		return new Point2D(getCenterX(), getCenterY());
-	}
 	
 	public double getCenterX() {
 		return position.x + getWidth() / 2;
@@ -101,14 +100,14 @@ public class AnimatedSprite {
 		return position.y + getHeight() / 2;
 	}
 	
-	public Point getCenter() {
+	public Point2D getCenter() {
 		int x = (int)getCenterX();
 		int y = (int)getCenterY();
-		return (new Point(x, y));
+		return new Point2D(x, y);
 	}
 	
 	public Rectangle getBounds() {
-		return (new Rectangle((int)position.x, (int)position.y, getWidth(), getHeight()));
+		return new Rectangle((int)position.x, (int)position.y, getWidth(), getHeight());
 	}
 	
 	public void load(String filename, int _columns, int _totalFrames, int _width, int _height) {
