@@ -18,7 +18,7 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 	
 	// Objects list
 	private LinkedList<AnimatedSprite> _sprites;
-	protected LinkedList<AnimatedSprite> sprites() { return _sprites; }
+	public LinkedList<AnimatedSprite> sprites() { return _sprites; }
 	
 	// Graphics rendering
 	private BufferedImage backBuffer;
@@ -55,21 +55,22 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 	abstract void spriteDraw(AnimatedSprite sprite);
 	abstract void spriteDying(AnimatedSprite sprite);
 	abstract void spriteCollision(AnimatedSprite spr1, AnimatedSprite spr2);
-	abstract void checkInput(); 
-	
-	public Game(int frameRate, int width, int height) {
-		super("GALACTIC WAR");
-		this.desiredFrameRate = frameRate;
-		this.screenWidth = width;
-		this.screenHeight = height;
-		init();
-	}
+	abstract void checkInput();			// ADDED 
 	
 	public Graphics2D graphics() { return g2d; }
 	public int frameRate() { return _frameRate; }
 	
 	public boolean mouseButton(int btn) { return mouseButtons[btn]; }
 	public Point2D mousePosition() { return mousePos; }
+	
+	
+	public Game(int frameRate, int width, int height) {
+		super("GALACTIC WAR");
+		this.desiredFrameRate = frameRate;
+		this.screenWidth = width;
+		this.screenHeight = height;
+		init();		// ADDED TO SIMULATE THE APPLET START
+	}
 	
 	public void init() {
 		backBuffer = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_RGB);
@@ -85,7 +86,7 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 	}
 	
 	public void paint(Graphics g) {
-		g2d.clearRect(0, 0, this.screenWidth, this.screenHeight);
+		g2d.clearRect(0, 0, this.screenWidth, this.screenHeight); // ADDED
 		
 		_frameCount++;
 		if(System.currentTimeMillis() > startTime + 1000) {
@@ -105,6 +106,7 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 	}	
 	
 	public void start() {		
+		// ADDED FOR BOOT
 		// Show the screen
 		setSize(this.screenWidth, this.screenHeight);
 		setVisible(true);
@@ -127,7 +129,7 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 			if (!gamePaused()) {
 				updateSprites();
 				testCollisions();
-				checkInput();
+				checkInput();		// ADDED there was no point where "checkInput" was called in the book
 			}
 			
 			gameTimeUpdate();
