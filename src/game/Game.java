@@ -7,7 +7,6 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
 import java.awt.image.*;
 import java.util.*;
 import java.lang.System;
@@ -18,8 +17,8 @@ abstract class Game extends JFrame implements Runnable, KeyListener, MouseListen
 	private Thread gameLoop;
 	
 	// Objects list
-	private LinkedList _sprites;
-	protected LinkedList sprites() { return _sprites; }
+	private LinkedList<AnimatedSprite> _sprites;
+	protected LinkedList<AnimatedSprite> sprites() { return _sprites; }
 	
 	// Graphics rendering
 	private BufferedImage backBuffer;

@@ -1,6 +1,5 @@
 package entities;
 
-import java.awt.*;
 import java.awt.Rectangle;
 
 public class Bullet extends VectorEntity {

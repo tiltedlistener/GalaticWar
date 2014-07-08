@@ -2,7 +2,6 @@ package sound;
 
 import javax.sound.midi.*;
 import java.io.*;
-import java.net.*;
 
 public class MidiSequence {
 

@@ -4,6 +4,8 @@ import java.awt.*;
 
 public class Point2D extends Point {
 
+	final static long serialVersionUID = 0;
+	
 	public double x;
 	public double y;
 	public int id;

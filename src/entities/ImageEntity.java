@@ -3,7 +3,6 @@ package entities;
 import java.awt.*;
 import java.awt.geom.*;
 import javax.swing.*;
-import java.net.*;
 
 public class ImageEntity extends BaseGameEntity {
 
@@ -66,6 +65,7 @@ public class ImageEntity extends BaseGameEntity {
 	}
 	
 	public void transform() {
+		System.out.println("Running Transform");
 		at.setToIdentity();
 		at.translate((int)getX() + width()/2, (int)getY() + height()/2);		
 		at.rotate(Math.toRadians(getFaceAngle()));

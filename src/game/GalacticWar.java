@@ -9,6 +9,8 @@ import java.util.*;
 import java.lang.System;
 
 public class GalacticWar extends Game {
+	
+	final static long serialVersionUID = 0;
 
 	public static void main(String[] args) {
 		new GalacticWar();
