@@ -2,307 +2,112 @@ package entities;
 
 import java.awt.*;
 import javax.swing.*;
+import java.awt.image.*;
 
-public class AnimatedSprite {
+public class AnimatedSprite extends Sprite{
 	
-	protected JFrame frame;
-	protected Graphics2D g2d;
-	protected ImageEntity image;		// Using ImageEntity instead of image
-	public boolean alive;
-	public boolean collided;
-	public Point2D position;
-	public Point2D velocity;
-	public double rotationRate;
-	public int currentState;
-	public int currentFrame, totalFrames;
-	public int animationDirection;
-	public int frameCount, frameDelay;
-	public int frameWidth, frameHeight, columns;
-	public double moveAngle, faceAngle;
-	
-	public int spriteType;
-	public int spriteState;
-	public int lifespan;
+    //this image holds the large tiled bitmap
+    private ImageEntity animImage;
+    //temp image passed to parent draw method
+    BufferedImage tempImage;
+    Graphics2D tempSurface;
+    //custom properties
+    private int currFrame, totFrames;
+    private int animDir;
+    private int frCount, frDelay;
+    private int frWidth, frHeight;
+    private int cols;
 	
 	public AnimatedSprite(JFrame _frame, Graphics2D _g2d) {
-		frame = _frame;
-		g2d = _g2d;
-		image = null;
-		alive = true;
-		position = new Point2D(0,0);
-		velocity = new Point2D(0,0);
-		rotationRate = 0.0;
-		currentState = 0;
-		currentFrame = 0;
-		totalFrames = 1;
-		animationDirection = 1;
-		frameCount = 0;
-		frameDelay = 0;
-		frameWidth = 0;
-		frameHeight = 0;
-		columns = 1;
-		moveAngle = 0.0;
-		faceAngle = 0.0;
+		super(_frame, _g2d);
+        animImage = new ImageEntity(_frame);
+        currFrame = 0;
+        totFrames = 0;
+        animDir = 1;
+        frCount = 0;
+        frDelay = 0;
+        frWidth = 0;
+        frHeight = 0;
+        cols = 0;
 	}
 	
-	public JFrame getJFrame() { return frame; }
-	public Graphics2D getGraphics() { return g2d; }
-	public void setGraphics(Graphics2D _g2d) { g2d = _g2d; }
-	
-	public void setImage(ImageEntity _image) { image = _image; }
-	
-	public int getWidth() {
-		if (image != null) {
-			return image.width();
-		} else {
-			return 0;
-		}
-	}
-	
-	public int getHeight() {
-		if (image != null) {
-			return image.height();
-		} else {
-			return 0;
-		}
-	}
-	
-	/**
-	 * Frame methods
-	 */
-	public void setFrameWidth(int frameWidth) {
-		this.frameWidth = frameWidth;
-	}
-	
-	public void setFrameHeight(int frameHeight) {
-		this.frameHeight = frameHeight;
-	}
-	public int frameWidth() { return frameWidth; }
-	public int frameHeight() { return frameHeight; }
-	
-	public void setColumns(int columns) {
-		this.columns = columns;
-	}
-	
-	public void setTotalFrames(int frames) {
-		this.totalFrames = frames;
-	}
-	
-	/**
-	 * Position relations
-	 */
-	
-	public double getCenterX() {
-		return position.x + getWidth() / 2;
-	}
-	
-	public double getCenterY() {
-		return position.y + getHeight() / 2;
-	}
-	
-	public Point2D getCenter() {
-		int x = (int)getCenterX();
-		int y = (int)getCenterY();
-		return new Point2D(x, y);
-	}
-	
-	public Rectangle getBounds() {
-		return new Rectangle((int)position.x, (int)position.y, getWidth(), getHeight());
-	}
-	
-	public void load(String filename, int _columns, int _totalFrames, int _width, int _height) {
-		Toolkit tk = Toolkit.getDefaultToolkit();
-		Image tempImage = tk.getImage(filename);
-		while(tempImage.getWidth(frame) <= 0);
-		image.setImage(tempImage);
-		columns = _columns;
-		totalFrames = _totalFrames;
-		frameWidth = _width;
-		frameHeight = _height;
-	}
-	
-	public void draw() {
-		int fx = (currentFrame % columns) * frameWidth;
-		int fy = (currentFrame / columns) * frameHeight;
-		g2d.drawImage(image.getImage(), (int)position.X(), (int)position.Y(), (int)position.X() + frameWidth, (int)position.Y() + frameHeight, fx, fy, fx+frameWidth, fy+frameHeight, getJFrame());
-	}	
-	
-	public void updateFrame() {
-		if (totalFrames > 1) {
-			frameCount++;
-			if(frameCount > frameDelay) {
-				frameCount = 0;
-				currentFrame += animationDirection;
-				if(currentFrame > totalFrames - 1) {
-					currentFrame = 0;
-				} else if (currentFrame < 0) {
-					currentFrame = totalFrames - 1;
-				}
-			}		
-		}
-	}
-	
-	public void transform() {
-		image.transform();
-	}
-	
-	public void update() {
-		position.x += velocity.x;
-		position.y += velocity.y;
-		
-		if (rotationRate > 0.0) {
-			faceAngle += rotationRate;
-			if(faceAngle < 0) {
-				faceAngle = 360 - rotationRate;
-			} else if (faceAngle > 360) {
-				faceAngle = rotationRate;
-			}
-		}
-		
-		if (totalFrames > 1) {
-			frameCount++;
-			if(frameCount > frameDelay) {
-				frameCount = 0;
-				currentFrame += animationDirection;
-				if(currentFrame > totalFrames - 1) {
-					currentFrame = 0;
-				} else if (currentFrame < 0) {
-					currentFrame = totalFrames - 1;
-				}
-			}		
-		}
-	}
-	
-	public void updatePosition() {
-		position.x += velocity.x;
-		position.y += velocity.y;
+    public void load(String filename, int columns, int rows,
+            int width, int height)
+        {
+            //load the tiled animation bitmap
+            animImage.load(filename);
+            setColumns(columns);
+            setTotalFrames(columns * rows);
+            setFrameWidth(width);
+            setFrameHeight(height);
 
-	}
-	
-	public void updateRotation() {
-		if (rotationRate > 0.0) {
-			faceAngle += rotationRate;
-			if(faceAngle < 0) {
-				faceAngle = 360 - rotationRate;
-			} else if (faceAngle > 360) {
-				faceAngle = rotationRate;
-			}
-		}
-	}
-	
-	public void updateAnimation() {
-		if (totalFrames > 1) {
-			frameCount++;
-			if(frameCount > frameDelay) {
-				frameCount = 0;
-				currentFrame += animationDirection;
-				if(currentFrame > totalFrames - 1) {
-					currentFrame = 0;
-				} else if (currentFrame < 0) {
-					currentFrame = totalFrames - 1;
-				}
-			}		
-		}
-	}
-	
-	public void setLifespan(int span) {
-		lifespan = span;
-	}
-	
-	public void updateLifetime() {
-		lifespan -= 1;
-	}
-	
-	public void drawBounds(Color c) {
-		g2d.setColor(c);
-		g2d.draw(getBounds());
-	}
-	
-	public boolean collidesWith(Rectangle rect) {
-		return (rect.intersects(getBounds()));
-	}
-	
-	public boolean collidesWith(AnimatedSprite sprite) {
-		return (getBounds().intersects(sprite.getBounds()));
-	}
+            //frame image is passed to parent class for drawing
+            tempImage = new BufferedImage(width, height,
+                BufferedImage.TYPE_INT_ARGB);
+            tempSurface = tempImage.createGraphics();
+            super.setImage(tempImage);
+        }
 
-	public boolean collidesWith(Point point) {
-		return (getBounds().contains(point.x, point.y));
-	}
-	
-	public void setAlive(boolean alive) {
-		this.alive = alive;
-	}
-	
-	public boolean alive() {
-		return this.alive;
-	}
-	
-	public void setFrameDelay(int delay) {
-		frameDelay = delay;
-	}
-	
-	public void setCurrentFrame(int frame) {
-		this.currentFrame = frame;
-	}
-	
-	public int totalFrames() {
-		return frameCount;
-	}
-	
-	public int currentFrame() {
-		return this.currentFrame;
-	}
-	
-	/**
-	 * Position and Motion variables
-	 */
-	public void setPosition(Point2D point) {
-		position = point;
-	}
-	
-	public Point2D position() {
-		return position;
-	}
-	
-	public void setVelocity(Point2D vel) {
-		this.velocity = vel;
-	}
-	public Point2D velocity() { return this.velocity; }
-	
-	public void setFaceAngle(double faceAngle) {
-		this.faceAngle = faceAngle;
-	}
+        public int currentFrame() { return currFrame; }
+        public void setCurrentFrame(int frame) { currFrame = frame; }
 
-	public void setMoveAngle(double moveAngle) {
-		this.moveAngle = moveAngle;
-	}
-	
-	public double moveAngle() { return this.moveAngle; }
-	public double faceAngle() { return this.faceAngle; }
-	
-	public void setRotationRate(double rate){
-		// STUB 
-	}
-	
-	/**
-	 * Game State
-	 */
-	public void setSpriteType(int type) {
-		spriteType = type;
-	}
-	
-	public int spriteType() {
-		return spriteType;
-	}
-	
-	public void setState(int state) {
-		spriteState = state;
-	}
-	public int state() { return this.spriteState; }
-	
-	public void setCollided(boolean collided) {
-		this.collided = collided;
-	}
-	public boolean collided() { return this.collided; }
+        public int frameWidth() { return frWidth; }
+        public void setFrameWidth(int width) { frWidth = width; }
+
+        public int frameHeight() { return frHeight; }
+        public void setFrameHeight(int height) { frHeight = height; }
+
+        public int totalFrames() { return totFrames; }
+        public void setTotalFrames(int total) { totFrames = total; }
+
+        public int animationDirection() { return animDir; }
+        public void setAnimationDirection(int dir) { animDir = dir; }
+
+        public int frameDelay() { return frDelay; }
+        public void setFrameDelay(int delay) { frDelay = delay; }
+
+        public int columns() { return cols; }
+        public void setColumns(int num) { cols = num; }
+
+        public Image getAnimImage() { return animImage.getImage(); }
+        public void setAnimImage(Image image) { animImage.setImage(image); }
+
+        public void updateAnimation() {
+            frCount += 1;
+            if (frCount > frDelay) {
+                frCount = 0;
+                //update the animation frame
+                currFrame += animDir;
+                if (currFrame > totFrames - 1) {
+                    currFrame = 0;
+                }
+                else if (currFrame < 0) {
+                    currFrame = totFrames - 1;
+                }
+            }
+        }
+
+        public void updateFrame() {
+            if (totFrames > 0) {
+                //calculate the current frame's X and Y position
+                int frameX = (currentFrame() % columns()) * frameWidth();
+                int frameY = (currentFrame() / columns()) * frameHeight();
+
+                if (tempImage == null) {
+                    tempImage = new BufferedImage(frameWidth(), frameHeight(),
+                                                  BufferedImage.TYPE_INT_ARGB);
+                    tempSurface = tempImage.createGraphics();
+                }
+
+                //copy the frame onto the temp image
+                if (animImage.getImage() != null) {
+                    tempSurface.drawImage(animImage.getImage(), 0, 0, frameWidth() - 1,
+                    frameHeight() - 1, frameX, frameY,
+                    frameX + frameWidth(),
+                    frameY + frameHeight(), animImage.getFrame());
+                }
+                //pass the temp image on to the parent class and draw it
+                super.setImage(tempImage);
+            }
+        }
 }

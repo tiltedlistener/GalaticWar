@@ -90,9 +90,9 @@ public class GalacticWar extends Game {
 		
 		AnimatedSprite ship = new AnimatedSprite(this, graphics());
 		ship.setSpriteType(SPRITE_SHIP);
-		ship.setImage(shipImage[0]);
-		ship.setFrameWidth(ship.getWidth());
-		ship.setFrameHeight(ship.getHeight());
+		ship.setImage(shipImage[0].getImage());
+		ship.setFrameWidth(ship.imageWidth());
+		ship.setFrameHeight(ship.imageHeight());
 		ship.setPosition(new Point2D(CENTERX, CENTERY));
 		ship.setAlive(true);
 		ship.setState(STATE_NORMAL);
@@ -323,19 +323,19 @@ public class GalacticWar extends Game {
 		switch(sprite.spriteType()) {
 		case SPRITE_ASTEROID_BIG:
 			ast.setSpriteType(SPRITE_ASTEROID_MEDIUM);
-			ast.setImage(medAsteroids[i]);
+			ast.setImage(medAsteroids[i].getImage());
 			ast.setFrameWidth(medAsteroids[i].width());
 			ast.setFrameHeight(medAsteroids[i].height());
 			break;
 		case SPRITE_ASTEROID_MEDIUM:
 			ast.setSpriteType(SPRITE_ASTEROID_SMALL);		
-			ast.setImage(smlAsteroids[i]);
+			ast.setImage(smlAsteroids[i].getImage());
 			ast.setFrameWidth(smlAsteroids[i].width());
 			ast.setFrameHeight(smlAsteroids[i].height());
 			break;
 		case SPRITE_ASTEROID_SMALL:
 			ast.setSpriteType(SPRITE_ASTEROID_TINY);
-			ast.setImage(tnyAsteroids[i]);
+			ast.setImage(tnyAsteroids[i].getImage());
 			ast.setFrameWidth(tnyAsteroids[i].width());
 			ast.setFrameHeight(tnyAsteroids[i].height());
 			break;					
@@ -355,7 +355,7 @@ public class GalacticWar extends Game {
 		ast.setSpriteType(SPRITE_ASTEROID_BIG);
 	
 		int i = 0;		
-		ast.setImage(bigAsteroids[i]);
+		ast.setImage(bigAsteroids[i].getImage());
 		ast.setFrameWidth(bigAsteroids[i].width());
 		ast.setFrameHeight(bigAsteroids[i].height());
 		
@@ -407,10 +407,10 @@ public class GalacticWar extends Game {
 		}
 		
 		if (keyUp) {
-			ship.setImage(shipImage[1]);
+			ship.setImage(shipImage[1].getImage());
 			applyThrust();
 		} else {
-			ship.setImage(shipImage[0]);
+			ship.setImage(shipImage[0].getImage());
 		}
 		
 	}
@@ -444,7 +444,7 @@ public class GalacticWar extends Game {
 		AnimatedSprite ship = (AnimatedSprite)sprites().get(0);
 		
 		AnimatedSprite bullet = new AnimatedSprite(this, graphics());
-		bullet.setImage(bulletImage);
+		bullet.setImage(bulletImage.getImage());
 		bullet.setFrameWidth(bulletImage.width());
 		bullet.setFrameHeight(bulletImage.height());
 		bullet.setSpriteType(SPRITE_BULLET);
@@ -453,8 +453,8 @@ public class GalacticWar extends Game {
 		bullet.setFaceAngle(ship.faceAngle());
 		bullet.setMoveAngle(ship.faceAngle() - 90);
 		
-		double x = ship.getCenter().X() - bullet.getWidth() / 2;
-		double y = ship.getCenter().Y() - bullet.getHeight() / 2;
+		double x = ship.center().X() - bullet.imageWidth() / 2;
+		double y = ship.center().Y() - bullet.imageHeight() / 2;
 		bullet.setPosition(new Point2D(x, y));
 		
 		double angle = bullet.moveAngle();
@@ -489,7 +489,7 @@ public class GalacticWar extends Game {
 		AnimatedSprite expl = new AnimatedSprite(this, graphics());
 		expl.setSpriteType(SPRITE_EXPLOSION);
 		expl.setAlive(true);
-		expl.setImage(explosions[0]);
+		expl.setImage(explosions[0].getImage());
 		expl.setTotalFrames(16);
 		expl.setColumns(1);
 		expl.setFrameWidth(60);
@@ -504,7 +504,7 @@ public class GalacticWar extends Game {
 		AnimatedSprite expl = new AnimatedSprite(this, graphics());
 		expl.setSpriteType(SPRITE_EXPLOSION);
 		expl.setAlive(true);
-		expl.setImage(explosions[0]);
+		expl.setImage(explosions[0].getImage());
 		expl.setTotalFrames(16);
 		expl.setColumns(1);
 		expl.setFrameWidth(60);

@@ -21,6 +21,10 @@ public class ImageEntity extends BaseGameEntity {
 		return image;
 	}
 	
+	public JFrame getFrame() {
+		return frame;
+	}
+	
 	public void setImage(Image image) {
 		this.image = image;
 		double x = frame.getSize().width/2 - width()/2;
