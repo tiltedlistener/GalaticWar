@@ -6,12 +6,9 @@ import java.awt.image.*;
 
 public class AnimatedSprite extends Sprite{
 	
-    //this image holds the large tiled bitmap
     private ImageEntity animImage;
-    //temp image passed to parent draw method
     BufferedImage tempImage;
     Graphics2D tempSurface;
-    //custom properties
     private int currFrame, totFrames;
     private int animDir;
     private int frCount, frDelay;

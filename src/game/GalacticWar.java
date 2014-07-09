@@ -59,7 +59,7 @@ public class GalacticWar extends Game {
 	Random rand;
 	
 	// Dev support
-	boolean showBounds = false;
+	boolean showBounds = true;
 	boolean collisionTesting = true;
 	long collisionTimer = 0;
 	
@@ -489,7 +489,7 @@ public class GalacticWar extends Game {
 		AnimatedSprite expl = new AnimatedSprite(this, graphics());
 		expl.setSpriteType(SPRITE_EXPLOSION);
 		expl.setAlive(true);
-		expl.setImage(explosions[0].getImage());
+		expl.setAnimImage(explosions[0].getImage());
 		expl.setTotalFrames(16);
 		expl.setColumns(1);
 		expl.setFrameWidth(60);
@@ -504,7 +504,7 @@ public class GalacticWar extends Game {
 		AnimatedSprite expl = new AnimatedSprite(this, graphics());
 		expl.setSpriteType(SPRITE_EXPLOSION);
 		expl.setAlive(true);
-		expl.setImage(explosions[0].getImage());
+		expl.setAnimImage(explosions[0].getImage());
 		expl.setTotalFrames(16);
 		expl.setColumns(1);
 		expl.setFrameWidth(60);
