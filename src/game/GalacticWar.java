@@ -86,7 +86,7 @@ public class GalacticWar extends Game {
 		shipImage[0] = new ImageEntity(this);
 		shipImage[0].load("images/spaceship.png");
 		shipImage[1] = new ImageEntity(this);
-		shipImage[1].load("images/spaceship_thrust.png");
+		shipImage[1].load("images/ship_thrust.png");
 		
 		AnimatedSprite ship = new AnimatedSprite(this, graphics());
 		ship.setSpriteType(SPRITE_SHIP);
@@ -106,24 +106,30 @@ public class GalacticWar extends Game {
 		explosions[1] = new ImageEntity(this);
 		explosions[1].load("images/explosion.png");	
 		
+		
+		
 		for(int n=0; n<5;n++) {
 			bigAsteroids[n] = new ImageEntity(this);
-			bigAsteroids[n].load("images/asteroid.png");
+			String tempName = "asteroid" + (n+1) + ".png";
+			bigAsteroids[n].load("images/" + tempName);
 		}
 
 		for(int n=0; n<2;n++) {
 			medAsteroids[n] = new ImageEntity(this);
-			medAsteroids[n].load("images/asteroidmedium.png");
+			String tempName = "medium" + (n+1) + ".png";
+			medAsteroids[n].load("images/" + tempName);
 		}
 		
 		for(int n=0; n<3;n++) {
 			smlAsteroids[n] = new ImageEntity(this);
-			smlAsteroids[n].load("images/asteroidsmall.png");
+			String tempName = "small" + (n+1) + ".png";
+			smlAsteroids[n].load("images/" + tempName);
 		}
 		
 		for(int n=0; n<4;n++) {
 			tnyAsteroids[n] = new ImageEntity(this);
-			tnyAsteroids[n].load("images/asteroidtiny.png");
+			String tempName = "tiny" + (n+1) + ".png";
+			tnyAsteroids[n].load("images/" + tempName);
 		}
 	
 		for(int n=0;n<ASTEROIDS;n++) {
