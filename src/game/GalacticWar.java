@@ -59,7 +59,7 @@ public class GalacticWar extends Game {
 	Random rand;
 	
 	// Dev support
-	boolean showBounds = true;
+	boolean showBounds = false;
 	boolean collisionTesting = true;
 	long collisionTimer = 0;
 	
@@ -104,7 +104,7 @@ public class GalacticWar extends Game {
 		explosions[0] = new ImageEntity(this);
 		explosions[0].load("images/explosion.png");
 		explosions[1] = new ImageEntity(this);
-		explosions[1].load("images/explosion.png");	
+		explosions[1].load("images/explosion2.png");	
 		
 		
 		
@@ -497,10 +497,10 @@ public class GalacticWar extends Game {
 		expl.setAlive(true);
 		expl.setAnimImage(explosions[0].getImage());
 		expl.setTotalFrames(16);
-		expl.setColumns(1);
-		expl.setFrameWidth(60);
-		expl.setFrameHeight(60);
-		expl.setFrameDelay(2);
+        expl.setColumns(4);
+        expl.setFrameWidth(96);
+        expl.setFrameHeight(96);
+        expl.setFrameDelay(2);
 		expl.setPosition(pos);
 		
 		sprites().add(expl);
@@ -510,12 +510,12 @@ public class GalacticWar extends Game {
 		AnimatedSprite expl = new AnimatedSprite(this, graphics());
 		expl.setSpriteType(SPRITE_EXPLOSION);
 		expl.setAlive(true);
-		expl.setAnimImage(explosions[0].getImage());
-		expl.setTotalFrames(16);
-		expl.setColumns(1);
-		expl.setFrameWidth(60);
-		expl.setFrameHeight(60);
-		expl.setFrameDelay(2);
+		expl.setAnimImage(explosions[1].getImage());
+		expl.setTotalFrames(8);
+        expl.setColumns(4);
+        expl.setFrameWidth(40);
+        expl.setFrameHeight(40);
+        expl.setFrameDelay(2);
 		expl.setPosition(pos);
 		
 		sprites().add(expl);
